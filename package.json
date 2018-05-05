@@ -5,6 +5,7 @@
   "repository": "git@github.com:amilajack/xwing.git",
   "author": "Amila Welihinda <amilajack@gmail.com>",
   "license": "MIT",
+  "dependencies": {},
   "devDependencies": {
     "eslint": "^4.19.1",
     "eslint-config-bliss": "^1.0.21",
@@ -13,6 +14,7 @@
   },
   "scripts": {
     "build": "webpack",
-    "lint": "eslint ./js --ignore-path .gitignore"
+    "lint": "eslint ./js --ignore-path .gitignore",
+    "start": "http-server ."
   }
 }

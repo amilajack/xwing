@@ -1,3 +1,4 @@
+// eslint-disable
 /**
  * @author sole / http://soledadpenades.com
  * @author mr.doob / http://mrdoob.com
@@ -6,7 +7,7 @@
  * @author Robert Penner / http://www.robertpenner.com/easing_terms_of_use.html
  */
 
-const TWEEN = TWEEN || (function () {
+const TWEEN = (function () {
   let i;
   let n;
   let time;

@@ -131,7 +131,7 @@ function init() {
 
   // Models
   loader = new THREE.JSONLoader();
-  loader.load({ model: 'trench.js', callback: trenchLoaded });
+  loader.load({ model: './js/trench.js', callback: trenchLoaded });
 
   // Lasers
   laserContainer = new THREE.Object3D();
@@ -436,7 +436,7 @@ function trenchLoaded(geometry) {
     trenchArray.push(mesh);
   }
 
-  loader.load({ model: 'xwing.js', callback: xwingLoaded });
+  loader.load({ model: './js/xwing.js', callback: xwingLoaded });
 }
 
 function xwingLoaded(geometry) {
