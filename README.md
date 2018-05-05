@@ -2,6 +2,13 @@ xwing
 =====
 A WebGL game powered by three.js. The original code was from [moxiecode.com](http://oos.moxiecode.com/js_webgl/xwing/)
 
-![demo](./img/demo.png)
+<img src="./img/demo.png" width="60%">
 
-PR's are welcome!
+## Setup
+*Note: this project requires `yarn`. If you don't have it, run `npm i -g yarn`*
+```bash
+git clone https://github.com/amilajack/xwing
+cd xwing
+yarn
+yarn start
+```
