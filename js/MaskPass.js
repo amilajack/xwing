@@ -2,49 +2,45 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.MaskPass = function ( scene, camera ) {
+THREE.MaskPass = function (scene, camera) {
+  this.scene = scene;
+  this.camera = camera;
 
-	this.scene = scene;
-	this.camera = camera;
-
-	this.clear = true;
-	this.needsSwap = false;
-
+  this.clear = true;
+  this.needsSwap = false;
 };
 
 THREE.MaskPass.prototype = {
 
-	render(renderer, writeBuffer, readBuffer, delta) {
+  render(renderer, writeBuffer, readBuffer, delta) {
+    const context = renderer.context;
 
-		const context = renderer.context;
+    // don't update color or depth
 
-		// don't update color or depth
+    context.colorMask(false, false, false, false);
+    context.depthMask(false);
 
-		context.colorMask( false, false, false, false );
-		context.depthMask( false );
+    // set up stencil
 
-		// set up stencil
+    context.enable(context.STENCIL_TEST);
+    context.stencilOp(context.REPLACE, context.REPLACE, context.REPLACE);
+    context.stencilFunc(context.ALWAYS, 1, 0xffffffff);
 
-		context.enable( context.STENCIL_TEST );
-		context.stencilOp( context.REPLACE, context.REPLACE, context.REPLACE );
-		context.stencilFunc( context.ALWAYS, 1, 0xffffffff );
+    // draw into the stencil buffer
 
-		// draw into the stencil buffer
+    renderer.render(this.scene, this.camera, readBuffer, this.clear);
+    renderer.render(this.scene, this.camera, writeBuffer, this.clear);
 
-		renderer.render( this.scene, this.camera, readBuffer, this.clear );
-		renderer.render( this.scene, this.camera, writeBuffer, this.clear );
+    // re-enable update of color and depth
 
-		// re-enable update of color and depth
+    context.colorMask(true, true, true, true);
+    context.depthMask(true);
 
-		context.colorMask( true, true, true, true );
-		context.depthMask( true );
+    // only render where stencil is set to 1
 
-		// only render where stencil is set to 1
-
-		context.stencilFunc( context.EQUAL, 1, 0xffffffff );  // draw if == 1
-		context.stencilOp( context.KEEP, context.KEEP, context.KEEP );
-
-	}
+    context.stencilFunc(context.EQUAL, 1, 0xffffffff); // draw if == 1
+    context.stencilOp(context.KEEP, context.KEEP, context.KEEP);
+  }
 
 };
 
@@ -55,12 +51,10 @@ THREE.ClearMaskPass = () => {
 
 THREE.ClearMaskPass.prototype = {
 
-	render(renderer, writeBuffer, readBuffer, delta) {
+  render(renderer, writeBuffer, readBuffer, delta) {
+    const context = renderer.context;
 
-		const context = renderer.context;
-
-		context.disable( context.STENCIL_TEST );
-
-	}
+    context.disable(context.STENCIL_TEST);
+  }
 
 };

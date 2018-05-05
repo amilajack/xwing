@@ -1,0 +1,18 @@
+{
+  "name": "xwing",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:amilajack/xwing.git",
+  "author": "Amila Welihinda <amilajack@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-bliss": "^1.0.21",
+    "http-server": "^0.11.1",
+    "webpack": "^4.7.0"
+  },
+  "scripts": {
+    "build": "webpack",
+    "lint": "eslint ./js --ignore-path .gitignore"
+  }
+}

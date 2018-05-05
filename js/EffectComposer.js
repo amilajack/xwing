@@ -2,132 +2,112 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.EffectComposer = function( renderer, renderTarget ) {
+THREE.EffectComposer = function (renderer, renderTarget) {
+  this.renderer = renderer;
 
-	this.renderer = renderer;
+  this.renderTarget1 = renderTarget;
 
-	this.renderTarget1 = renderTarget;
+  if (this.renderTarget1 === undefined) {
+    this.renderTargetParameters = {
+      minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false
+    };
+    this.renderTarget1 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.renderTargetParameters);
+  }
 
-	if ( this.renderTarget1 === undefined ) {
+  this.renderTarget2 = this.renderTarget1.clone();
 
-		this.renderTargetParameters = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat, stencilBufer: false };
-		this.renderTarget1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, this.renderTargetParameters );
+  this.writeBuffer = this.renderTarget1;
+  this.readBuffer = this.renderTarget2;
 
-	}
+  this.passes = [];
 
-	this.renderTarget2 = this.renderTarget1.clone();
-
-	this.writeBuffer = this.renderTarget1;
-	this.readBuffer = this.renderTarget2;
-
-	this.passes = [];
-
-	this.copyPass = new THREE.ShaderPass( THREE.ShaderExtras[ "screen" ] );
-
+  this.copyPass = new THREE.ShaderPass(THREE.ShaderExtras.screen);
 };
 
 THREE.EffectComposer.prototype = {
 
-	swapBuffers() {
+  swapBuffers() {
+    const tmp = this.readBuffer;
+    this.readBuffer = this.writeBuffer;
+    this.writeBuffer = tmp;
+  },
 
-		const tmp = this.readBuffer;
-		this.readBuffer = this.writeBuffer;
-		this.writeBuffer = tmp;
+  addPass(pass) {
+    this.passes.push(pass);
+  },
 
-	},
+  render(delta) {
+    this.writeBuffer = this.renderTarget1;
+    this.readBuffer = this.renderTarget2;
 
-	addPass(pass) {
+    let maskActive = false;
 
-		this.passes.push( pass );
+    let i;
+    const il = this.passes.length;
 
-	},
+    for (i = 0; i < il; i++) {
+      this.passes[i].render(this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive);
 
-	render(delta) {
-        this.writeBuffer = this.renderTarget1;
-        this.readBuffer = this.renderTarget2;
+      if (this.passes[i].needsSwap) {
+        if (maskActive) {
+          const context = this.renderer.context;
 
-        let maskActive = false;
+          context.stencilFunc(context.NOTEQUAL, 1, 0xffffffff);
 
-        let i;
-        const il = this.passes.length;
+          this.copyPass.render(this.renderer, this.writeBuffer, this.readBuffer, delta);
 
-        for ( i = 0; i < il; i ++ ) {
+          context.stencilFunc(context.EQUAL, 1, 0xffffffff);
+        }
 
-			this.passes[ i ].render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
+        this.swapBuffers();
+      }
 
-			if ( this.passes[ i ].needsSwap ) {
+      if (this.passes[i] instanceof THREE.MaskPass) {
+        maskActive = true;
+      }
 
-				if ( maskActive ) {
+      if (this.passes[i] instanceof THREE.ClearMaskPass) {
+        maskActive = false;
+      }
+    }
+  },
 
-					const context = this.renderer.context;
+  reset(renderTarget) {
+    this.renderTarget1 = renderTarget;
 
-					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
+    if (this.renderTarget1 === undefined) {
+      this.renderTarget1 = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, this.renderTargetParameters);
+    }
 
-					this.copyPass.render( this.renderer, this.writeBuffer, this.readBuffer, delta );
+    this.renderTarget2 = this.renderTarget1.clone();
 
-					context.stencilFunc( context.EQUAL, 1, 0xffffffff );
+    this.writeBuffer = this.renderTarget1;
+    this.readBuffer = this.renderTarget2;
 
-				}
+    THREE.EffectComposer.quad.scale.set(window.innerWidth, window.innerHeight, 1);
 
-				this.swapBuffers();
+    THREE.EffectComposer.camera.left = window.innerWidth / -2;
+    THREE.EffectComposer.camera.right = window.innerWidth / 2;
+    THREE.EffectComposer.camera.top = window.innerHeight / 2;
+    THREE.EffectComposer.camera.bottom = window.innerHeight / -2;
 
-			}
-
-			if ( this.passes[ i ] instanceof THREE.MaskPass ) {
-
-				maskActive = true;
-
-			}
-
-			if ( this.passes[ i ] instanceof THREE.ClearMaskPass ) {
-
-				maskActive = false;
-
-			}
-
-		}
-    },
-
-	reset(renderTarget) {
-
-		this.renderTarget1 = renderTarget;
-
-		if ( this.renderTarget1 === undefined ) {
-
-			this.renderTarget1 = new THREE.WebGLRenderTarget( window.innerWidth, window.innerHeight, this.renderTargetParameters );
-
-		}
-
-		this.renderTarget2 = this.renderTarget1.clone();
-
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
-
-		THREE.EffectComposer.quad.scale.set( window.innerWidth, window.innerHeight, 1 );
-
-		THREE.EffectComposer.camera.left = window.innerWidth / - 2;
-		THREE.EffectComposer.camera.right = window.innerWidth / 2;
-		THREE.EffectComposer.camera.top = window.innerHeight / 2;
-		THREE.EffectComposer.camera.bottom = window.innerHeight / - 2;
-
-		THREE.EffectComposer.camera.updateProjectionMatrix();
-
-	}
+    THREE.EffectComposer.camera.updateProjectionMatrix();
+  }
 
 };
 
 // shared fullscreen quad scene
 
-THREE.EffectComposer.geometry = new THREE.PlaneGeometry( 1, 1 );
+THREE.EffectComposer.geometry = new THREE.PlaneGeometry(1, 1);
 
-THREE.EffectComposer.quad = new THREE.Mesh( THREE.EffectComposer.geometry, null );
+THREE.EffectComposer.quad = new THREE.Mesh(THREE.EffectComposer.geometry, null);
 THREE.EffectComposer.quad.position.z = -100;
-THREE.EffectComposer.quad.scale.set( window.innerWidth, window.innerHeight, 1 );
+THREE.EffectComposer.quad.scale.set(window.innerWidth, window.innerHeight, 1);
 
 THREE.EffectComposer.scene = new THREE.Scene();
-THREE.EffectComposer.scene.addObject( THREE.EffectComposer.quad );
+THREE.EffectComposer.scene.addObject(THREE.EffectComposer.quad);
 
 // shared ortho camera
 
-THREE.EffectComposer.camera = new THREE.OrthoCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, -10000, 10000 );
+THREE.EffectComposer.camera = new THREE.OrthoCamera(window.innerWidth / -2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / -2, -10000, 10000);
 
