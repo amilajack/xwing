@@ -131,7 +131,7 @@ function init() {
 
   // Models
   loader = new THREE.JSONLoader();
-  loader.load({ model: './js/trench.js', callback: trenchLoaded });
+  loader.load({ model: './models/trench.js', callback: trenchLoaded });
 
   // Lasers
   laserContainer = new THREE.Object3D();
@@ -436,7 +436,7 @@ function trenchLoaded(geometry) {
     trenchArray.push(mesh);
   }
 
-  loader.load({ model: './js/xwing.js', callback: xwingLoaded });
+  loader.load({ model: './models/xwing.js', callback: xwingLoaded });
 }
 
 function xwingLoaded(geometry) {
@@ -928,7 +928,7 @@ function run(delta) {
 }
 
 function explode() {
-  playSound(explodeSound, 0.45);
+  playSound(window.explodeSound, 0.45);
 
   for (let i = 0; i < particleArray.length; ++i) {
     const particles = particleArray[i].p;

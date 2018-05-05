@@ -55,6 +55,8 @@ if (Audio != undefined) {
   const blasterSound = new Audio('../snd/blaster.ogg');
   const explodeSound = new Audio('../snd/explode.ogg');
 
+  window.explodeSound = explodeSound;
+
   var worldMusic = new Audio('../snd/music.ogg');
   worldMusic.volume = 0.1;
   worldMusic.loop = true;

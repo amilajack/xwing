@@ -15,7 +15,7 @@
 //
 
 /** @namespace */
-const THREEx	=  {};
+const THREEx	= {};
 
 /**
  * Update renderer and camera when the window is resized
