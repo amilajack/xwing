@@ -12,3 +12,8 @@ cd xwing
 yarn
 yarn start
 ```
+
+## Todos
+* Add webpack support
+* Migrate to newer version of three.js
+* Upgrade all code to ESNext
