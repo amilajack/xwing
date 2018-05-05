@@ -353,6 +353,7 @@ var container;
                function loadingComplete() {
                    allLoaded = true;
                    scene.removeChild( loadingSprite );
+                   loadingSprite = undefined;
                    showInstruction(true);
                }
 
@@ -369,7 +370,7 @@ var container;
 
                function removeBg() {
                    scene.removeChild( bgSprite );
-                   delete bgSprite;
+                   bgSprite = undefined;
                }
 
                function addParticles() {
