@@ -8,7 +8,7 @@ var container;
 
                var render_gl = 1;
                var has_gl = 0;
-               
+
                var r = 0;
 
                var delta
@@ -73,7 +73,7 @@ var container;
                document.addEventListener( 'keydown', onDocumentKeyDown, false );
                document.addEventListener( 'keyup', onDocumentKeyUp, false );
 
-               init(), animate();              
+               init(), animate();
 
 
                function init() {
@@ -85,7 +85,7 @@ var container;
                    touchDevice = ('ontouchstart' in document.getElementById("container")) || (navigator.userAgent.match(/ipad|iphone|android/i) != null);
                    if (touchDevice) sizeRatio = 3;
                    if (touchDevice) postprocessing = false;
-                   
+
                    var aspect = window.innerWidth / window.innerHeight;
 
                    camera = new THREE.Camera( 50, aspect, 1, 100000 );
@@ -178,7 +178,7 @@ var container;
                    // obstacle types
                    // horizontal wall, vertical wall, 1/4 passage down
                    var numArray = [4,3,1,1];
-           
+
                    // Obstacles
                    for (var i=0; i<4; ++i ) {
                        var material = new THREE.MeshPhongMaterial( { color: 0x111111, ambient: 0x222222, specular: 0x000000, shininess: 100, shading: THREE.SmoothShading } );
@@ -193,7 +193,7 @@ var container;
                                THREE.GeometryUtils.merge(box,inmesh);
                            }
                            box.computeFaceNormals();
-                       } else if (i == 1) {    
+                       } else if (i == 1) {
                            var box = new THREE.CubeGeometry(450,1200,220);
                            // extras
                            var inbox = new THREE.CubeGeometry(260,260,260);
@@ -203,8 +203,8 @@ var container;
                                inmesh.rotation.x = (Math.random()*0.4)-0.2;
                                THREE.GeometryUtils.merge(box,inmesh);
                            }
-                           box.computeFaceNormals();                       
-                       } else if (i == 2 || i == 3) {  
+                           box.computeFaceNormals();
+                       } else if (i == 2 || i == 3) {
                            var box = new THREE.CubeGeometry(1200,800,220);
                            var extrabox = new THREE.CubeGeometry(600,600,220);
                            var extramesh = new THREE.Mesh(extrabox, material);
@@ -235,7 +235,7 @@ var container;
 
                            box.computeFaceNormals();
                        }
-                       
+
                        for (var j=0; j<numArray[i]; ++j ) {
                            var mesh = new THREE.Mesh(box, material);
                            if (i == 0) {
@@ -263,7 +263,7 @@ var container;
                    try {
                        webglRenderer = new THREE.WebGLRenderer( { scene: scene, clearColor: 0x000000, clearAlpha: 0.99, antialias: false } );
                        webglRenderer.setSize( window.innerWidth/sizeRatio, window.innerHeight/sizeRatio );
-                       
+
                        webglRenderer.autoClear = false;
 
                        webglRenderer.shadowMapBias = 0.0039;
@@ -329,7 +329,7 @@ var container;
 
                // fullscreen test
                function toggleFullscreen () {
-                   if (!inFullscreen) {            
+                   if (!inFullscreen) {
                        try {
                            if (container.webkitRequestFullScreen) {
                                container.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
@@ -342,9 +342,9 @@ var container;
                        }
                    } else {
                        if (document.webkitCancelFullScreen) {
-                           document.webkitCancelFullScreen();  
+                           document.webkitCancelFullScreen();
                        } else {
-                           document.mozCancelFullScreen(); 
+                           document.mozCancelFullScreen();
                        }
                        inFullscreen = false;
                    }
@@ -353,8 +353,6 @@ var container;
                function loadingComplete() {
                    allLoaded = true;
                    scene.removeChild( loadingSprite );
-                   delete loadingSprite;
-
                    showInstruction(true);
                }
 
@@ -389,7 +387,7 @@ var container;
                    var sizeArray = [48,48,48,48,64];
 
                    for (var i=0; i<15; ++i ) {
-                       
+
                        var color = colorArray[i%colorArray.length];
                        var size = sizeArray[i%sizeArray.length];
 
@@ -483,7 +481,7 @@ var container;
                }
 
                function showResult(currentscore) {
-                   var resultbox = document.getElementById("resultbox");  
+                   var resultbox = document.getElementById("resultbox");
                    resultbox.innerHTML = "<img src='img/gameover.png'><BR><BR>";
                    var scoreStr = currentscore.toString();
                    var imageStr = "";
@@ -494,7 +492,7 @@ var container;
 
                    resultbox.innerHTML += "<img src='img/yougot.png'> "+imageStr+" <img src='img/points.png'><BR><BR>";
                    resultbox.innerHTML += "<img src='img/gameover_end.png'>";
-                   resultbox.style.display = "block";  
+                   resultbox.style.display = "block";
                    resultbox.style.marginLeft = "-" + parseInt(resultbox.offsetWidth / 2) + "px";
                    resultbox.style.marginTop = "-" + parseInt(resultbox.offsetHeight / 2) + "px";
 
@@ -504,28 +502,28 @@ var container;
                    isDead = false;
                    deadTimer = time;
 
-                   var resultbox = document.getElementById("resultbox"); 
+                   var resultbox = document.getElementById("resultbox");
                    resultbox.style.display = "none";
                }
 
                function showInstruction(loadingComplete) {
-                   var instructionbox = document.getElementById("instructionbox");  
+                   var instructionbox = document.getElementById("instructionbox");
                    if (loadingComplete) {
                        instructionbox.innerHTML = "<img src='img/click.png'>";
                    }
                    instructionbox.innerHTML += "<BR><BR><img src='img/instructions.png'>";
-                   instructionbox.style.display = "block"; 
+                   instructionbox.style.display = "block";
                    instructionbox.style.marginLeft = "-" + parseInt(instructionbox.offsetWidth / 2) + "px";
                    instructionbox.style.marginTop = "-" + parseInt(instructionbox.offsetHeight / 2) + "px";
                }
 
                function hideInstruction () {
-                   var instructionbox = document.getElementById("instructionbox"); 
+                   var instructionbox = document.getElementById("instructionbox");
                    instructionbox.style.display = "none";
                }
 
-               function onTouchStart(event) { 
-                   
+               function onTouchStart(event) {
+
                    event.preventDefault();
 
                    if (allLoaded && !started) {
@@ -533,7 +531,7 @@ var container;
                        return;
                    }
 
-                   var resultbox = document.getElementById("resultbox"); 
+                   var resultbox = document.getElementById("resultbox");
                    if (isDead && resultbox.style.display ==== "block") {
                        hideResult();
                        // reset
@@ -551,7 +549,7 @@ var container;
 
                }
 
-               function onTouchMove(event) { 
+               function onTouchMove(event) {
 
                    event.preventDefault();
 
@@ -566,7 +564,7 @@ var container;
 
                }
 
-               function onTouchEnd(event) { 
+               function onTouchEnd(event) {
 
                    event.preventDefault();
                    mouseDown = false;
@@ -574,7 +572,7 @@ var container;
                }
 
                function onDocumentMouseMove(event) {
-                   
+
                    event.preventDefault();
 
                    var windowHalfX = window.innerWidth >> 1;
@@ -589,7 +587,7 @@ var container;
                }
 
                function onDocumentMouseDown(event) {
-                   
+
                    event.preventDefault();
 
                    if (allLoaded && !started) {
@@ -597,7 +595,7 @@ var container;
                        return;
                    }
 
-                   var resultbox = document.getElementById("resultbox"); 
+                   var resultbox = document.getElementById("resultbox");
                    if (isDead && resultbox.style.display ==== "block") {
                        hideResult();
                        // reset
@@ -607,7 +605,7 @@ var container;
                    }
 
                    if (event.button == 2) {
-                       mouseDown = true;                   
+                       mouseDown = true;
                    } else {
                        changeRotation();
                    }
@@ -615,14 +613,14 @@ var container;
                }
 
                function onDocumentMouseUp(event) {
-                   
+
                    event.preventDefault();
                    mouseDown = false;
 
                }
 
                function onDocumentKeyDown( event ) {
-                   
+
                    if (event.keyCode == 70) {
                        toggleFullscreen();
                    }
@@ -632,7 +630,7 @@ var container;
                        return;
                    }
 
-                   var resultbox = document.getElementById("resultbox"); 
+                   var resultbox = document.getElementById("resultbox");
                    if (isDead && resultbox.style.display ==== "block") {
                        hideResult();
                        // reset
@@ -665,7 +663,7 @@ var container;
 
                    }
                }
-               
+
                function changeRotation() {
                    if (!sideWays.state) {
                        sideWays.state = true;
@@ -694,7 +692,7 @@ var container;
                function getRandomPointOnSphere(r) {
                    var angle = Math.random() * Math.PI * 2;
                    var u = Math.random() * 2 - 1;
-                  
+
                    var v = new THREE.Vector3(
                        Math.cos(angle) * Math.sqrt(1 - Math.pow(u, 2)) * r,
                        Math.sin(angle) * Math.sqrt(1 - Math.pow(u, 2)) * r,
@@ -774,7 +772,7 @@ var container;
                            if (difz < 170 && difz > -170) {
                                var dify = xwing.position.y-mesh.position.y;
                                var difx = xwing.position.x-mesh.position.x;
-                               
+
                                if (type == 0) {
                                    // horizontal bar
                                    if (!sideWays.state && dify < 210 && dify > -210) {
@@ -845,7 +843,7 @@ var container;
 
                        }
                    }
-       
+
                    // key control
                    if (leftIsDown) mouseXpercent -= 0.003*delta;
                    if (rightIsDown) mouseXpercent += 0.003*delta;
@@ -869,7 +867,7 @@ var container;
 
                    var tox = mouseXpercent*380;
                    var toy = -(mouseYpercent*350)+30;
-                   
+
                    if (sideWays.state) {
                        tox = mouseXpercent*480;
                        toy = -(mouseYpercent*250)+30;
@@ -904,7 +902,7 @@ var container;
                    if (!ship.visible) {
                        opacity = 0;
                    }
-       
+
                    thrust0.opacity = opacity;
                    thrust1.opacity = opacity;
                    thrust2.opacity = opacity;
@@ -916,7 +914,7 @@ var container;
                        if (time < deadTimer+600) {
                            ship.visible = false;
                        }
-                       
+
                        if (time < deadTimer+800 && time > deadTimer+700) {
                            ship.visible = false;
                        }
@@ -999,11 +997,11 @@ var container;
                }
 
                function explodeDone() {
-                   
+
                    for (var i=0; i<particleArray.length; ++i ) {
                        var particles = particleArray[i].p;
                        var material = particleArray [i].m;
-                   
+
                        particles.rotation.set(Math.random()*Math.PI,Math.random()*Math.PI,Math.random()*Math.PI);
                        particles.scale.set(0.1,0.1,0.1);
                        material.opacity = 1;
@@ -1014,7 +1012,7 @@ var container;
                            .easing(TWEEN.Easing.Linear.EaseNone)
                        positiontween.start();
                    }
-                   
+
                    showResult(score);
                }
 
@@ -1029,7 +1027,7 @@ var container;
 
                    laserContainer.rotation = xwing.rotation.clone();
                    laserContainer.rotation.y = Math.PI/2;
-                   
+
                    laserContainer.rotation.z -= sideWays.rotation;
 
                    laserContainer.position = xwing.position.clone();
@@ -1049,7 +1047,7 @@ var container;
                    laser0Mesh.visible = true;
                    laser1Mesh.visible = true;
                    laser2Mesh.visible = true;
-                   laser3Mesh.visible = true;  
+                   laser3Mesh.visible = true;
 
                    pointLight.position.z = -2000;
                    pointLight.position.y = 0;
