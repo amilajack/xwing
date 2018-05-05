@@ -1,0 +1,19 @@
+ #instructionbox
+ {
+  position: absolute;
+  padding: 12px;
+  left: 50%;
+  top: 50%;
+  color: #fff;
+  background-color: #121212;
+  z-index: 13;
+  display:none;
+  text-align:center;
+  font: 10px/1.2 Verdana, Arial, Helvetica, Sans-Serif;
+  opacity: 0.8;
+  border-radius: 20px;
+  padding: 48px;
+  width: 600px;
+ }
+h10 {font-size:22px;}
+h20 {font-size:12px;}

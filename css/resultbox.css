@@ -1,0 +1,23 @@
+ #resultbox
+ {
+  position: absolute;
+  padding: 12px;
+  left: 50%;
+  top: 50%;
+  color: #fff;
+  background-color: #121212;
+  z-index: 12;
+  display:none;
+  text-align:center;
+  font: 10px/1.2 Verdana, Arial, Helvetica, Sans-Serif;
+  opacity: 0.8;
+  border-radius: 20px;
+  padding: 48px;
+  width: 300px;
+ }
+h10 {font-size:22px;}
+h20 {font-size:12px;}
+
+/*
+#info { text-align:left; font: 10px/1.2 Verdana, Arial, Helvetica, Sans-Serif; margin:0.5em 0em 0em 0.4em; z-index:11; position:absolute; display:none; color:#fff; background: #121212; opacity:0.8; border-radius:20px; padding: 32px }
+*/
