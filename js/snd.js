@@ -1,6 +1,6 @@
 // setup
-var numOfChannels = 6;
-var audiochannels = [];
+const numOfChannels = 6;
+const audiochannels = [];
 for (a=0;a<numOfChannels ;a++) {
 	audiochannels[a] = new Array();
 	if (Audio != undefined) {
@@ -9,7 +9,7 @@ for (a=0;a<numOfChannels ;a++) {
 	audiochannels[a]["finished"] = -1;
 }
 
-var soundOn = true;
+let soundOn = true;
 if (Audio == undefined) {
 	soundOn = false;
 }
@@ -32,7 +32,7 @@ function playSound (id, vol) {
 	if (!soundOn || Audio == undefined) {
 		return;
 	}
-	var volume = 1;
+	let volume = 1;
 	if (vol != undefined) {
 		volume = vol;
 	}
@@ -52,8 +52,8 @@ function playSound (id, vol) {
 
 if (Audio != undefined) {
 	// sounds
-	var blasterSound = new Audio("../snd/blaster.ogg");
-	var explodeSound = new Audio("../snd/explode.ogg");
+	const blasterSound = new Audio("../snd/blaster.ogg");
+	const explodeSound = new Audio("../snd/explode.ogg");
 
 	var worldMusic = new Audio("../snd/music.ogg");
 	worldMusic.volume = 0.1;

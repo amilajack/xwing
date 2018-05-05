@@ -2,29 +2,25 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
+THREE.BloomPass = function(strength = 1, kernelSize = 25, sigma = 4.0, resolution) {
+    resolution = ( resolution !== resolution ) ? resolution : 256;
 
-	strength = ( strength !== undefined ) ? strength : 1;
-	kernelSize = ( kernelSize !== undefined ) ? kernelSize : 25;
-	sigma = ( sigma !== undefined ) ? sigma : 4.0;
-	resolution = ( resolution !== resolution ) ? resolution : 256;
+    // render targets
 
-	// render targets
+    const pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
 
-	var pars = { minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, format: THREE.RGBFormat };
+    this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+    this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
 
-	this.renderTargetX = new THREE.WebGLRenderTarget( resolution, resolution, pars );
-	this.renderTargetY = new THREE.WebGLRenderTarget( resolution, resolution, pars );
+    // screen material
 
-	// screen material
+    const screenShader = THREE.ShaderExtras[ "screen" ];
 
-	var screenShader = THREE.ShaderExtras[ "screen" ];
+    this.screenUniforms = THREE.UniformsUtils.clone( screenShader.uniforms );
 
-	this.screenUniforms = THREE.UniformsUtils.clone( screenShader.uniforms );
+    this.screenUniforms[ "opacity" ].value = strength;
 
-	this.screenUniforms[ "opacity" ].value = strength;
-
-	this.materialScreen = new THREE.MeshShaderMaterial( {
+    this.materialScreen = new THREE.MeshShaderMaterial( {
 
 		uniforms: this.screenUniforms,
 		vertexShader: screenShader.vertexShader,
@@ -34,30 +30,29 @@ THREE.BloomPass = function( strength, kernelSize, sigma, resolution ) {
 
 	} );
 
-	// convolution material
+    // convolution material
 
-	var convolutionShader = THREE.ShaderExtras[ "convolution" ];
+    const convolutionShader = THREE.ShaderExtras[ "convolution" ];
 
-	this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
+    this.convolutionUniforms = THREE.UniformsUtils.clone( convolutionShader.uniforms );
 
-	this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
-	this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderExtras.buildKernel( sigma );
+    this.convolutionUniforms[ "uImageIncrement" ].value = THREE.BloomPass.blurx;
+    this.convolutionUniforms[ "cKernel" ].value = THREE.ShaderExtras.buildKernel( sigma );
 
-	this.materialConvolution = new THREE.MeshShaderMaterial( {
+    this.materialConvolution = new THREE.MeshShaderMaterial( {
 
 		uniforms: this.convolutionUniforms,
-		vertexShader:   "#define KERNEL_SIZE " + kernelSize + ".0\n" + convolutionShader.vertexShader,
-		fragmentShader: "#define KERNEL_SIZE " + kernelSize + "\n"   + convolutionShader.fragmentShader
+		vertexShader:   `#define KERNEL_SIZE ${kernelSize}.0\n${convolutionShader.vertexShader}`,
+		fragmentShader: `#define KERNEL_SIZE ${kernelSize}\n${convolutionShader.fragmentShader}`
 
 	} );
 
-	this.needsSwap = false;
-
+    this.needsSwap = false;
 };
 
 THREE.BloomPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta, maskActive ) {
+	render(renderer, writeBuffer, readBuffer, delta, maskActive) {
 
 		if ( maskActive ) renderer.context.disable( renderer.context.STENCIL_TEST );
 

@@ -6,17 +6,19 @@
  * @author Robert Penner / http://www.robertpenner.com/easing_terms_of_use.html
  */
 
-var TWEEN = TWEEN || ( function() {
+const TWEEN = TWEEN || ( function() {
+    let i;
+    let n;
+    let time;
+    const tweens = [];
 
-	var i, n, time, tweens = [];
-
-	this.add = function ( tween ) {
+    this.add = tween => {
 
 		tweens.push( tween );
 
 	};
 
-	this.remove = function ( tween ) {
+    this.remove = tween => {
 
 		i = tweens.indexOf( tween );
 
@@ -28,7 +30,7 @@ var TWEEN = TWEEN || ( function() {
 
 	};
 
-	this.update = function () {
+    this.update = () => {
 
 		i = 0;
 		n = tweens.length;
@@ -51,25 +53,23 @@ var TWEEN = TWEEN || ( function() {
 
 	};
 
-	return this;
-
+    return this;
 } )();
 
 TWEEN.Tween = function ( object ) {
+    const _object = object;
+    const _valuesStart = {};
+    const _valuesDelta = {};
+    const _valuesEnd = {};
+    let _duration = 1000;
+    let _delayTime = 0;
+    let _startTime = null;
+    let _easingFunction = TWEEN.Easing.Linear.EaseNone;
+    let _chainedTween = null;
+    let _onUpdateCallback = null;
+    let _onCompleteCallback = null;
 
-	var _object = object,
-	_valuesStart = {},
-	_valuesDelta = {},
-	_valuesEnd = {},
-	_duration = 1000,
-	_delayTime = 0,
-	_startTime = null,
-	_easingFunction = TWEEN.Easing.Linear.EaseNone,
-	_chainedTween = null,
-	_onUpdateCallback = null,
-	_onCompleteCallback = null;
-
-	this.to = function ( properties, duration ) {
+    this.to = function ( properties, duration ) {
 
 		if( duration !== null ) {
 
@@ -77,7 +77,7 @@ TWEEN.Tween = function ( object ) {
 
 		}
 
-		for ( var property in properties ) {
+		for ( const property in properties ) {
 
 			// This prevents the engine from interpolating null values
 			if ( _object[ property ] === null ) {
@@ -96,13 +96,13 @@ TWEEN.Tween = function ( object ) {
 
 	};
 
-	this.start = function () {
+    this.start = function () {
 
 		TWEEN.add( this );
 
 		_startTime = new Date().getTime() + _delayTime;
 
-		for ( var property in _valuesEnd ) {
+		for ( const property in _valuesEnd ) {
 
 			// Again, prevent dealing with null values
 			if ( _object[ property ] === null ) {
@@ -119,75 +119,76 @@ TWEEN.Tween = function ( object ) {
 		return this;
 	};
 
-	this.stop = function () {
+    this.stop = function () {
 
 		TWEEN.remove( this );
 		return this;
 
 	};
 
-	this.delay = function ( amount ) {
+    this.delay = function ( amount ) {
 
 		_delayTime = amount;
 		return this;
 
 	};
 
-	this.easing = function ( easing ) {
+    this.easing = function ( easing ) {
 
 		_easingFunction = easing;
 		return this;
 
 	};
 
-	this.chain = function ( chainedTween ) {
+    this.chain = chainedTween => {
 
 		_chainedTween = chainedTween;
 
 	};
 
-	this.onUpdate = function ( onUpdateCallback ) {
+    this.onUpdate = function ( onUpdateCallback ) {
 
 		_onUpdateCallback = onUpdateCallback;
 		return this;
 
 	};
 
-	this.onComplete = function ( onCompleteCallback ) {
+    this.onComplete = function ( onCompleteCallback ) {
 
 		_onCompleteCallback = onCompleteCallback;
 		return this;
 
 	};
 
-	this.update = function ( time ) {
+    this.update = time => {
+        let property;
+        let elapsed;
+        let value;
 
-		var property, elapsed, value;
-
-		if ( time < _startTime ) {
+        if ( time < _startTime ) {
 
 			return true;
 
 		}
 
-		elapsed = ( time - _startTime ) / _duration;
-		elapsed = elapsed > 1 ? 1 : elapsed;
+        elapsed = ( time - _startTime ) / _duration;
+        elapsed = elapsed > 1 ? 1 : elapsed;
 
-		value = _easingFunction( elapsed );
+        value = _easingFunction( elapsed );
 
-		for ( property in _valuesDelta ) {
+        for ( property in _valuesDelta ) {
 
 			_object[ property ] = _valuesStart[ property ] + _valuesDelta[ property ] * value;
 
 		}
 
-		if ( _onUpdateCallback !== null ) {
+        if ( _onUpdateCallback !== null ) {
 
 			_onUpdateCallback.call( _object, value );
 
 		}
 
-		if ( elapsed == 1 ) {
+        if ( elapsed == 1 ) {
 
 			if ( _onCompleteCallback !== null ) {
 
@@ -205,11 +206,10 @@ TWEEN.Tween = function ( object ) {
 
 		}
 
-		return true;
+        return true;
+    };
 
-	};
-
-	/*
+    /*
 	this.destroy = function () {
 
 		TWEEN.remove( this );
@@ -221,27 +221,15 @@ TWEEN.Tween = function ( object ) {
 TWEEN.Easing = { Linear: {}, Quadratic: {}, Cubic: {}, Quartic: {}, Quintic: {}, Sinusoidal: {}, Exponential: {}, Circular: {}, Elastic: {}, Back: {}, Bounce: {} };
 
 
-TWEEN.Easing.Linear.EaseNone = function ( k ) {
-
-	return k;
-
-};
+TWEEN.Easing.Linear.EaseNone = k => k;
 
 //
 
-TWEEN.Easing.Quadratic.EaseIn = function ( k ) {
+TWEEN.Easing.Quadratic.EaseIn = k => k * k;
 
-	return k * k;
+TWEEN.Easing.Quadratic.EaseOut = k => - k * ( k - 2 );
 
-};
-
-TWEEN.Easing.Quadratic.EaseOut = function ( k ) {
-
-	return - k * ( k - 2 );
-
-};
-
-TWEEN.Easing.Quadratic.EaseInOut = function ( k ) {
+TWEEN.Easing.Quadratic.EaseInOut = k => {
 
 	if ( ( k *= 2 ) < 1 ) return 0.5 * k * k;
 	return - 0.5 * ( --k * ( k - 2 ) - 1 );
@@ -250,19 +238,11 @@ TWEEN.Easing.Quadratic.EaseInOut = function ( k ) {
 
 //
 
-TWEEN.Easing.Cubic.EaseIn = function ( k ) {
+TWEEN.Easing.Cubic.EaseIn = k => k * k * k;
 
-	return k * k * k;
+TWEEN.Easing.Cubic.EaseOut = k => --k * k * k + 1;
 
-};
-
-TWEEN.Easing.Cubic.EaseOut = function ( k ) {
-
-	return --k * k * k + 1;
-
-};
-
-TWEEN.Easing.Cubic.EaseInOut = function ( k ) {
+TWEEN.Easing.Cubic.EaseInOut = k => {
 
 	if ( ( k *= 2 ) < 1 ) return 0.5 * k * k * k;
 	return 0.5 * ( ( k -= 2 ) * k * k + 2 );
@@ -271,19 +251,11 @@ TWEEN.Easing.Cubic.EaseInOut = function ( k ) {
 
 //
 
-TWEEN.Easing.Quartic.EaseIn = function ( k ) {
+TWEEN.Easing.Quartic.EaseIn = k => k * k * k * k;
 
-	return k * k * k * k;
+TWEEN.Easing.Quartic.EaseOut = k => - ( --k * k * k * k - 1 )
 
-};
-
-TWEEN.Easing.Quartic.EaseOut = function ( k ) {
-
-	 return - ( --k * k * k * k - 1 );
-
-}
-
-TWEEN.Easing.Quartic.EaseInOut = function ( k ) {
+TWEEN.Easing.Quartic.EaseInOut = k => {
 
 	if ( ( k *= 2 ) < 1) return 0.5 * k * k * k * k;
 	return - 0.5 * ( ( k -= 2 ) * k * k * k - 2 );
@@ -292,19 +264,11 @@ TWEEN.Easing.Quartic.EaseInOut = function ( k ) {
 
 //
 
-TWEEN.Easing.Quintic.EaseIn = function ( k ) {
+TWEEN.Easing.Quintic.EaseIn = k => k * k * k * k * k;
 
-	return k * k * k * k * k;
+TWEEN.Easing.Quintic.EaseOut = k => ( k = k - 1 ) * k * k * k * k + 1;
 
-};
-
-TWEEN.Easing.Quintic.EaseOut = function ( k ) {
-
-	return ( k = k - 1 ) * k * k * k * k + 1;
-
-};
-
-TWEEN.Easing.Quintic.EaseInOut = function ( k ) {
+TWEEN.Easing.Quintic.EaseInOut = k => {
 
 	if ( ( k *= 2 ) < 1 ) return 0.5 * k * k * k * k * k;
 	return 0.5 * ( ( k -= 2 ) * k * k * k * k + 2 );
@@ -313,62 +277,34 @@ TWEEN.Easing.Quintic.EaseInOut = function ( k ) {
 
 // 
 
-TWEEN.Easing.Sinusoidal.EaseIn = function ( k ) {
+TWEEN.Easing.Sinusoidal.EaseIn = k => - Math.cos( k * Math.PI / 2 ) + 1;
 
-	return - Math.cos( k * Math.PI / 2 ) + 1;
+TWEEN.Easing.Sinusoidal.EaseOut = k => Math.sin( k * Math.PI / 2 );
 
-};
-
-TWEEN.Easing.Sinusoidal.EaseOut = function ( k ) {
-
-	return Math.sin( k * Math.PI / 2 );
-
-};
-
-TWEEN.Easing.Sinusoidal.EaseInOut = function ( k ) {
-
-	return - 0.5 * ( Math.cos( Math.PI * k ) - 1 );
-
-};
+TWEEN.Easing.Sinusoidal.EaseInOut = k => - 0.5 * ( Math.cos( Math.PI * k ) - 1 );
 
 //
 
-TWEEN.Easing.Exponential.EaseIn = function ( k ) {
+TWEEN.Easing.Exponential.EaseIn = k => k == 0 ? 0 : 2 ** (10 * (k - 1));
 
-	return k == 0 ? 0 : Math.pow( 2, 10 * ( k - 1 ) );
+TWEEN.Easing.Exponential.EaseOut = k => k == 1 ? 1 : - (2 ** (- 10 * k)) + 1;
 
-};
-
-TWEEN.Easing.Exponential.EaseOut = function ( k ) {
-
-	return k == 1 ? 1 : - Math.pow( 2, - 10 * k ) + 1;
-
-};
-
-TWEEN.Easing.Exponential.EaseInOut = function ( k ) {
+TWEEN.Easing.Exponential.EaseInOut = k => {
 
 	if ( k == 0 ) return 0;
         if ( k == 1 ) return 1;
-        if ( ( k *= 2 ) < 1 ) return 0.5 * Math.pow( 2, 10 * ( k - 1 ) );
-        return 0.5 * ( - Math.pow( 2, - 10 * ( k - 1 ) ) + 2 );
+        if ( ( k *= 2 ) < 1 ) return 0.5 * (2 ** (10 * (k - 1)));
+        return 0.5 * ( - (2 ** (- 10 * (k - 1))) + 2 );
 
 };
 
 // 
 
-TWEEN.Easing.Circular.EaseIn = function ( k ) {
+TWEEN.Easing.Circular.EaseIn = k => - ( Math.sqrt( 1 - k * k ) - 1);
 
-	return - ( Math.sqrt( 1 - k * k ) - 1);
+TWEEN.Easing.Circular.EaseOut = k => Math.sqrt( 1 - --k * k );
 
-};
-
-TWEEN.Easing.Circular.EaseOut = function ( k ) {
-
-	return Math.sqrt( 1 - --k * k );
-
-};
-
-TWEEN.Easing.Circular.EaseInOut = function ( k ) {
+TWEEN.Easing.Circular.EaseInOut = k => {
 
 	if ( ( k /= 0.5 ) < 1) return - 0.5 * ( Math.sqrt( 1 - k * k) - 1);
 	return 0.5 * ( Math.sqrt( 1 - ( k -= 2) * k) + 1);
@@ -377,56 +313,56 @@ TWEEN.Easing.Circular.EaseInOut = function ( k ) {
 
 //
 
-TWEEN.Easing.Elastic.EaseIn = function( k ) {
-
-	var s, a = 0.1, p = 0.4;
-	if ( k == 0 ) return 0; if ( k == 1 ) return 1; if ( !p ) p = 0.3;
-	if ( !a || a < 1 ) { a = 1; s = p / 4; }
+TWEEN.Easing.Elastic.EaseIn = k => {
+    let s;
+    let a = 0.1;
+    let p = 0.4;
+    if ( k == 0 ) return 0;if ( k == 1 ) return 1;if ( !p ) p = 0.3;
+    if ( !a || a < 1 ) { a = 1; s = p / 4; }
 	else s = p / ( 2 * Math.PI ) * Math.asin( 1 / a );
-	return - ( a * Math.pow( 2, 10 * ( k -= 1 ) ) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) );
-
+    return - ( a * (2 ** (10 * (k -= 1))) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) );
 };
 
-TWEEN.Easing.Elastic.EaseOut = function( k ) {
-
-	var s, a = 0.1, p = 0.4;
-	if ( k == 0 ) return 0; if ( k == 1 ) return 1; if ( !p ) p = 0.3;
-	if ( !a || a < 1 ) { a = 1; s = p / 4; }
+TWEEN.Easing.Elastic.EaseOut = k => {
+    let s;
+    let a = 0.1;
+    let p = 0.4;
+    if ( k == 0 ) return 0;if ( k == 1 ) return 1;if ( !p ) p = 0.3;
+    if ( !a || a < 1 ) { a = 1; s = p / 4; }
 	else s = p / ( 2 * Math.PI ) * Math.asin( 1 / a );
-	return ( a * Math.pow( 2, - 10 * k) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) + 1 );
-
+    return a * (2 ** (- 10 * k)) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) + 1;
 };
 
-TWEEN.Easing.Elastic.EaseInOut = function( k ) {
-
-	var s, a = 0.1, p = 0.4;
-	if ( k == 0 ) return 0; if ( k == 1 ) return 1; if ( !p ) p = 0.3;
-        if ( !a || a < 1 ) { a = 1; s = p / 4; }
-        else s = p / ( 2 * Math.PI ) * Math.asin( 1 / a );
-        if ( ( k *= 2 ) < 1 ) return - 0.5 * ( a * Math.pow( 2, 10 * ( k -= 1 ) ) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) );
-        return a * Math.pow( 2, -10 * ( k -= 1 ) ) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) * 0.5 + 1;
-
+TWEEN.Easing.Elastic.EaseInOut = k => {
+    let s;
+    let a = 0.1;
+    let p = 0.4;
+    if ( k == 0 ) return 0;if ( k == 1 ) return 1;if ( !p ) p = 0.3;
+    if ( !a || a < 1 ) { a = 1; s = p / 4; }
+    else s = p / ( 2 * Math.PI ) * Math.asin( 1 / a );
+    if ( ( k *= 2 ) < 1 ) return - 0.5 * ( a * (2 ** (10 * (k -= 1))) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) );
+    return a * (2 ** (-10 * (k -= 1))) * Math.sin( ( k - s ) * ( 2 * Math.PI ) / p ) * 0.5 + 1;
 };
 
 //
 
-TWEEN.Easing.Back.EaseIn = function( k ) {
+TWEEN.Easing.Back.EaseIn = k => {
 
-	var s = 1.70158;
+	const s = 1.70158;
 	return k * k * ( ( s + 1 ) * k - s );
 
 };
 
-TWEEN.Easing.Back.EaseOut = function( k ) {
+TWEEN.Easing.Back.EaseOut = k => {
 
-	var s = 1.70158;
+	const s = 1.70158;
 	return ( k = k - 1 ) * k * ( ( s + 1 ) * k + s ) + 1;
 
 };
 
-TWEEN.Easing.Back.EaseInOut = function( k ) {
+TWEEN.Easing.Back.EaseInOut = k => {
 
-	var s = 1.70158 * 1.525;
+	const s = 1.70158 * 1.525;
 	if ( ( k *= 2 ) < 1 ) return 0.5 * ( k * k * ( ( s + 1 ) * k - s ) );
 	return 0.5 * ( ( k -= 2 ) * k * ( ( s + 1 ) * k + s ) + 2 );
 
@@ -434,13 +370,9 @@ TWEEN.Easing.Back.EaseInOut = function( k ) {
 
 // 
 
-TWEEN.Easing.Bounce.EaseIn = function( k ) {
+TWEEN.Easing.Bounce.EaseIn = k => 1 - TWEEN.Easing.Bounce.EaseOut( 1 - k );
 
-	return 1 - TWEEN.Easing.Bounce.EaseOut( 1 - k );
-
-};
-
-TWEEN.Easing.Bounce.EaseOut = function( k ) {
+TWEEN.Easing.Bounce.EaseOut = k => {
 
 	if ( ( k /= 1 ) < ( 1 / 2.75 ) ) {
 
@@ -462,7 +394,7 @@ TWEEN.Easing.Bounce.EaseOut = function( k ) {
 
 };
 
-TWEEN.Easing.Bounce.EaseInOut = function( k ) {
+TWEEN.Easing.Bounce.EaseInOut = k => {
 
 	if ( k < 0.5 ) return TWEEN.Easing.Bounce.EaseIn( k * 2 ) * 0.5;
 	return TWEEN.Easing.Bounce.EaseOut( k * 2 - 1 ) * 0.5 + 0.5;

@@ -23,7 +23,7 @@ THREE.ShaderPass = function( shader, textureID ) {
 
 THREE.ShaderPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render(renderer, writeBuffer, readBuffer, delta) {
 
 		this.uniforms[ this.textureID ].texture = readBuffer;
 

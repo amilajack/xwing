@@ -28,30 +28,30 @@ THREE.EffectComposer = function( renderer, renderTarget ) {
 
 THREE.EffectComposer.prototype = {
 
-	swapBuffers: function() {
+	swapBuffers() {
 
-		var tmp = this.readBuffer;
+		const tmp = this.readBuffer;
 		this.readBuffer = this.writeBuffer;
 		this.writeBuffer = tmp;
 
 	},
 
-	addPass: function ( pass ) {
+	addPass(pass) {
 
 		this.passes.push( pass );
 
 	},
 
-	render: function ( delta ) {
+	render(delta) {
+        this.writeBuffer = this.renderTarget1;
+        this.readBuffer = this.renderTarget2;
 
-		this.writeBuffer = this.renderTarget1;
-		this.readBuffer = this.renderTarget2;
+        let maskActive = false;
 
-		var maskActive = false;
+        let i;
+        const il = this.passes.length;
 
-		var i, il = this.passes.length;
-
-		for ( i = 0; i < il; i ++ ) {
+        for ( i = 0; i < il; i ++ ) {
 
 			this.passes[ i ].render( this.renderer, this.writeBuffer, this.readBuffer, delta, maskActive );
 
@@ -59,7 +59,7 @@ THREE.EffectComposer.prototype = {
 
 				if ( maskActive ) {
 
-					var context = this.renderer.context;
+					const context = this.renderer.context;
 
 					context.stencilFunc( context.NOTEQUAL, 1, 0xffffffff );
 
@@ -86,10 +86,9 @@ THREE.EffectComposer.prototype = {
 			}
 
 		}
+    },
 
-	},
-
-	reset: function ( renderTarget ) {
+	reset(renderTarget) {
 
 		this.renderTarget1 = renderTarget;
 

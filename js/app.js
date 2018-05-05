@@ -534,7 +534,7 @@ var container;
                    }
 
                    var resultbox = document.getElementById("resultbox"); 
-                   if (isDead && resultbox.style.display == "block") {
+                   if (isDead && resultbox.style.display ==== "block") {
                        hideResult();
                        // reset
                        score = 0;
@@ -598,7 +598,7 @@ var container;
                    }
 
                    var resultbox = document.getElementById("resultbox"); 
-                   if (isDead && resultbox.style.display == "block") {
+                   if (isDead && resultbox.style.display ==== "block") {
                        hideResult();
                        // reset
                        score = 0;
@@ -633,7 +633,7 @@ var container;
                    }
 
                    var resultbox = document.getElementById("resultbox"); 
-                   if (isDead && resultbox.style.display == "block") {
+                   if (isDead && resultbox.style.display ==== "block") {
                        hideResult();
                        // reset
                        score = 0;

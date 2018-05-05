@@ -4,7 +4,7 @@
 
 THREE.FilmPass = function( noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale ) {
 
-	var shader = THREE.ShaderExtras[ "film" ];
+	const shader = THREE.ShaderExtras[ "film" ];
 
 	this.uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
@@ -28,7 +28,7 @@ THREE.FilmPass = function( noiseIntensity, scanlinesIntensity, scanlinesCount, g
 
 THREE.FilmPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render(renderer, writeBuffer, readBuffer, delta) {
 
 		this.uniforms[ "tDiffuse" ].texture = readBuffer;
 		this.uniforms[ "time" ].value += delta;

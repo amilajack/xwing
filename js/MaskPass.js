@@ -14,9 +14,9 @@ THREE.MaskPass = function ( scene, camera ) {
 
 THREE.MaskPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render(renderer, writeBuffer, readBuffer, delta) {
 
-		var context = renderer.context;
+		const context = renderer.context;
 
 		// don't update color or depth
 
@@ -49,15 +49,15 @@ THREE.MaskPass.prototype = {
 };
 
 
-THREE.ClearMaskPass = function () {
+THREE.ClearMaskPass = () => {
 
 };
 
 THREE.ClearMaskPass.prototype = {
 
-	render: function ( renderer, writeBuffer, readBuffer, delta ) {
+	render(renderer, writeBuffer, readBuffer, delta) {
 
-		var context = renderer.context;
+		const context = renderer.context;
 
 		context.disable( context.STENCIL_TEST );
 
