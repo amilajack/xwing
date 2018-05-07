@@ -45,9 +45,7 @@ THREE.MaskPass.prototype = {
 };
 
 
-THREE.ClearMaskPass = () => {
-
-};
+THREE.ClearMaskPass = function ClearMaskPass() {};
 
 THREE.ClearMaskPass.prototype = {
 

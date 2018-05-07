@@ -1,15 +1,12 @@
 let container;
-let stats;
 
 let camera;
 let scene;
 let webglRenderer;
 let loader;
 
-const render_gl = 1;
-let has_gl = 0;
-
-const r = 0;
+const renderGl = 1;
+let hasGl = 0;
 
 let delta;
 let time;
@@ -38,15 +35,15 @@ const trenchArray = [];
 const trenchLength = 7600;
 let xwing;
 let ship;
-let thrust0,
-  thrust1,
-  thrust2,
-  thrust3;
+let thrust0;
+let thrust1;
+let thrust2;
+let thrust3;
 let laserContainer;
-let laser0Mesh,
-  laser1Mesh,
-  laser2Mesh,
-  laser3Mesh;
+let laser0Mesh;
+let laser1Mesh;
+let laser2Mesh;
+let laser3Mesh;
 let lastFireTime = 0;
 let pointLight;
 const obstaclePool = [];
@@ -59,29 +56,14 @@ let allLoaded = false;
 let started = false;
 let bgSprite;
 let loadingSprite;
-const initTime = new Date().getTime() + 500;
 let score = 0;
 
-let composer,
-  effectFocus;
+let composer;
+let effectFocus;
 
 let touchDevice = false;
 let sizeRatio = 1;
 let postprocessing = true;
-
-
-document.addEventListener('contextmenu', (event) => { event.preventDefault(); }, false);
-document.addEventListener('mousemove', onDocumentMouseMove, false);
-document.addEventListener('mousedown', onDocumentMouseDown, false);
-document.addEventListener('mouseup', onDocumentMouseUp, false);
-document.addEventListener('touchstart', onTouchStart, false);
-document.addEventListener('touchmove', onTouchMove, false);
-document.addEventListener('touchend', onTouchEnd, false);
-document.addEventListener('keydown', onDocumentKeyDown, false);
-document.addEventListener('keyup', onDocumentKeyUp, false);
-
-init(), animate();
-
 
 function init() {
   container = document.createElement('div');
@@ -291,7 +273,7 @@ function init() {
     webglRenderer.shadowCameraFov = 50;
 
     container.appendChild(webglRenderer.domElement);
-    has_gl = 1;
+    hasGl = 1;
     THREEx.WindowResize(webglRenderer, camera);
 
     webglRenderer.domElement.style.position = 'absolute';
@@ -1125,7 +1107,7 @@ function loop() {
 
   TWEEN.update();
 
-  if (render_gl && has_gl) {
+  if (renderGl && hasGl) {
     webglRenderer.clear();
     if (postprocessing) {
       composer.render(delta);
@@ -1135,3 +1117,15 @@ function loop() {
   }
 }
 
+document.addEventListener('contextmenu', (event) => { event.preventDefault(); }, false);
+document.addEventListener('mousemove', onDocumentMouseMove, false);
+document.addEventListener('mousedown', onDocumentMouseDown, false);
+document.addEventListener('mouseup', onDocumentMouseUp, false);
+document.addEventListener('touchstart', onTouchStart, false);
+document.addEventListener('touchmove', onTouchMove, false);
+document.addEventListener('touchend', onTouchEnd, false);
+document.addEventListener('keydown', onDocumentKeyDown, false);
+document.addEventListener('keyup', onDocumentKeyUp, false);
+
+init();
+animate();

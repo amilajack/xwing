@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.FilmPass = function (noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale) {
+THREE.FilmPass = function FilmPass(noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale) {
   const shader = THREE.ShaderExtras.film;
 
   this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);

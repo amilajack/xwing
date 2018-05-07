@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.BloomPass = function (strength = 1, kernelSize = 25, sigma = 4.0, resolution) {
+THREE.BloomPass = function BloomPass(strength = 1, kernelSize = 25, sigma = 4.0, resolution) {
   resolution = (resolution !== resolution) ? resolution : 256;
 
   // render targets

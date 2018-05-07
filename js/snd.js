@@ -2,24 +2,15 @@
 const numOfChannels = 6;
 const audiochannels = [];
 for (a = 0; a < numOfChannels; a++) {
-  audiochannels[a] = new Array();
-  if (Audio != undefined) {
-    audiochannels[a].channel = new Audio();
-  }
+  audiochannels[a] = [];
+  audiochannels[a].channel = new Audio();
   audiochannels[a].finished = -1;
 }
 
 let soundOn = true;
-if (Audio == undefined) {
-  soundOn = false;
-}
 
 function toggleSound(bool) {
   soundOn = bool;
-
-  if (Audio == undefined) {
-    soundOn = false;
-  }
 
   if (!soundOn) {
     worldMusic.pause();
@@ -50,15 +41,13 @@ function playSound(id, vol) {
   }
 }
 
-if (Audio != undefined) {
-  // sounds
-  const blasterSound = new Audio('../snd/blaster.ogg');
-  const explodeSound = new Audio('../snd/explode.ogg');
+// sounds
+// const blasterSound = new Audio('../snd/blaster.ogg');
+const explodeSound = new Audio('../snd/explode.ogg');
 
-  window.explodeSound = explodeSound;
+window.explodeSound = explodeSound;
 
-  var worldMusic = new Audio('../snd/music.ogg');
-  worldMusic.volume = 0.1;
-  worldMusic.loop = true;
-  worldMusic.play();
-}
+const worldMusic = new Audio('../snd/music.ogg');
+worldMusic.volume = 0.1;
+worldMusic.loop = true;
+worldMusic.play();

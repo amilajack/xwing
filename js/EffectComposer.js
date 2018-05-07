@@ -2,7 +2,7 @@
  * @author alteredq / http://alteredqualia.com/
  */
 
-THREE.EffectComposer = function (renderer, renderTarget) {
+THREE.EffectComposer = function EffectComposer(renderer, renderTarget) {
   this.renderer = renderer;
 
   this.renderTarget1 = renderTarget;
