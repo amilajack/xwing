@@ -664,8 +664,8 @@ function getRandomPointOnSphere(r) {
   const u = Math.random() * 2 - 1;
 
   const v = new THREE.Vector3(
-    Math.cos(angle) * Math.sqrt(1 - Math.pow(u, 2)) * r,
-    Math.sin(angle) * Math.sqrt(1 - Math.pow(u, 2)) * r,
+    Math.cos(angle) * Math.sqrt(1 - u ** 2) * r,
+    Math.sin(angle) * Math.sqrt(1 - u ** 2) * r,
     u * r
   );
   return v;
