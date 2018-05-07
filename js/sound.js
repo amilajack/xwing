@@ -1,7 +1,7 @@
 // setup
 const numOfChannels = 6;
 const audiochannels = [];
-for (a = 0; a < numOfChannels; a++) {
+for (let a = 0; a < numOfChannels; a++) {
   audiochannels[a] = [];
   audiochannels[a].channel = new Audio();
   audiochannels[a].finished = -1;
@@ -20,7 +20,7 @@ function toggleSound(bool) {
 }
 
 function playSound(id, vol) {
-  if (!soundOn || Audio == undefined) {
+  if (!soundOn) {
     return;
   }
   let volume = 1;
@@ -28,8 +28,8 @@ function playSound(id, vol) {
     volume = vol;
   }
 
-  for (a = 0; a < numOfChannels; a++) {
-    thistime = new Date();
+  for (let a = 0; a < numOfChannels; a++) {
+    const thistime = new Date();
     if (audiochannels[a].finished < thistime.getTime()) { // is this channel finished?
       audiochannels[a].finished = thistime.getTime() + id.duration * 1000;
       audiochannels[a].channel.src = id.src;
@@ -42,12 +42,12 @@ function playSound(id, vol) {
 }
 
 // sounds
-// const blasterSound = new Audio('../snd/blaster.ogg');
-const explodeSound = new Audio('../snd/explode.ogg');
+// const blasterSound = new Audio('../sound/blaster.ogg');
+const explodeSound = new Audio('../sound/explode.ogg');
 
 window.explodeSound = explodeSound;
 
-const worldMusic = new Audio('../snd/music.ogg');
+const worldMusic = new Audio('../sound/music.ogg');
 worldMusic.volume = 0.1;
 worldMusic.loop = true;
 worldMusic.play();

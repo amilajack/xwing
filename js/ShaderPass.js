@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.ShaderPass = function ShaderPass(shader, textureID) {
   this.textureID = (textureID !== undefined) ? textureID : 'tDiffuse';
 
@@ -20,7 +16,6 @@ THREE.ShaderPass = function ShaderPass(shader, textureID) {
 };
 
 THREE.ShaderPass.prototype = {
-
   render(renderer, writeBuffer, readBuffer, delta) {
     this.uniforms[this.textureID].texture = readBuffer;
 
@@ -32,5 +27,4 @@ THREE.ShaderPass.prototype = {
       renderer.render(THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false);
     }
   }
-
 };

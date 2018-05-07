@@ -1,7 +1,3 @@
-/**
- * @author alteredq / http://alteredqualia.com/
- */
-
 THREE.RenderPass = function RenderPass(scene, camera, overrideMaterial) {
   this.scene = scene;
   this.camera = camera;
