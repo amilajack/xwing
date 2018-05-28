@@ -10,10 +10,9 @@
     "eslint": "^4.19.1",
     "eslint-config-bliss": "^1.0.21",
     "http-server": "^0.11.1",
-    "webpack": "^4.7.0"
+    "parcel": "^1.8.1"
   },
   "scripts": {
-    "build": "webpack",
     "lint": "eslint ./js --ignore-path .gitignore",
     "lint-fix": "yarn lint --fix",
     "start": "http-server ."

@@ -1,16 +1,11 @@
 THREE.ShaderPass = function ShaderPass(shader, textureID) {
   this.textureID = (textureID !== undefined) ? textureID : 'tDiffuse';
-
   this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-
   this.material = new THREE.MeshShaderMaterial({
-
     uniforms: this.uniforms,
     vertexShader: shader.vertexShader,
     fragmentShader: shader.fragmentShader
-
   });
-
   this.renderToScreen = false;
   this.needsSwap = true;
 };

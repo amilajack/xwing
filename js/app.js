@@ -174,7 +174,7 @@ function init() {
     var material = new THREE.MeshPhongMaterial({
       color: 0x111111, ambient: 0x222222, specular: 0x000000, shininess: 100, shading: THREE.SmoothShading
     });
-    if (i == 0) {
+    if (i === 0) {
       var box = new THREE.CubeGeometry(1200, 300, 220);
       // extras
       var inbox = new THREE.CubeGeometry(260, 260, 260);
@@ -185,7 +185,7 @@ function init() {
         THREE.GeometryUtils.merge(box, inmesh);
       }
       box.computeFaceNormals();
-    } else if (i == 1) {
+    } else if (i === 1) {
       var box = new THREE.CubeGeometry(450, 1200, 220);
       // extras
       var inbox = new THREE.CubeGeometry(260, 260, 260);
@@ -196,11 +196,11 @@ function init() {
         THREE.GeometryUtils.merge(box, inmesh);
       }
       box.computeFaceNormals();
-    } else if (i == 2 || i == 3) {
+    } else if (i === 2 || i === 3) {
       var box = new THREE.CubeGeometry(1200, 800, 220);
       const extrabox = new THREE.CubeGeometry(600, 600, 220);
       const extramesh = new THREE.Mesh(extrabox, material);
-      if (i == 2) {
+      if (i === 2) {
         extramesh.position.set(300, -400, 0);
       } else {
         extramesh.position.set(300, 400, 0);
@@ -216,7 +216,7 @@ function init() {
       }
       for (var j = 0; j < 8; ++j) {
         var inmesh = new THREE.Mesh(inbox, material);
-        if (i == 2) {
+        if (i === 2) {
           inmesh.position.set(((Math.random() * 300) - 150) + 300, ((Math.random() * 300) - 150) - 400, (Math.random() * 100) - 50);
         } else {
           inmesh.position.set(((Math.random() * 300) - 150) + 300, ((Math.random() * 300) - 150) + 400, (Math.random() * 100) - 50);
@@ -230,13 +230,13 @@ function init() {
 
     for (var j = 0; j < numArray[i]; ++j) {
       const mesh = new THREE.Mesh(box, material);
-      if (i == 0) {
+      if (i === 0) {
         mesh.position.y = (Math.random() * 900) - 400;
-      } else if (i == 1) {
+      } else if (i === 1) {
         mesh.position.x = (Math.random() * 1200) - 600;
-      } else if (i == 2) {
+      } else if (i === 2) {
         mesh.position.y = 200;
-      } else if (i == 3) {
+      } else if (i === 3) {
         mesh.position.y = -200;
       }
       mesh.castShadow = true;
@@ -585,7 +585,7 @@ function onDocumentMouseDown(event) {
     return;
   }
 
-  if (event.button == 2) {
+  if (event.button === 2) {
     mouseDown = true;
   } else {
     changeRotation();
@@ -598,7 +598,7 @@ function onDocumentMouseUp(event) {
 }
 
 function onDocumentKeyDown(event) {
-  if (event.keyCode == 70) {
+  if (event.keyCode === 70) {
     toggleFullscreen();
   }
 
@@ -672,7 +672,7 @@ function getRandomPointOnSphere(r) {
 }
 
 function spawnNewObstacle() {
-  if (obstaclePool.length == 0) {
+  if (obstaclePool.length === 0) {
     console.log('no objects in pool');
     return;
   }
@@ -687,11 +687,11 @@ function spawnNewObstacle() {
 
   // add mesh
   mesh.position.z = (-(numOfTrench - 1) * trenchLength) - (trenchLength / 2);
-  if (type == 0) {
+  if (type === 0) {
     mesh.position.y = (Math.random() * 900) - 400;
-  } else if (type == 1) {
+  } else if (type === 1) {
     mesh.position.x = (Math.random() * 1200) - 600;
-  } else if (type == 2 || type == 3) {
+  } else if (type === 2 || type === 3) {
     // random flip
     let rot = 0;
     if (Math.random() > 0.5) rot = Math.PI;
@@ -741,7 +741,7 @@ function run(delta) {
         var dify = xwing.position.y - mesh.position.y;
         var difx = xwing.position.x - mesh.position.x;
 
-        if (type == 0) {
+        if (type === 0) {
           // horizontal bar
           if (!sideWays.state && dify < 210 && dify > -210) {
             explode();
@@ -755,7 +755,7 @@ function run(delta) {
           }
         }
 
-        if (type == 1) {
+        if (type === 1) {
           // vertical bar
           if (!sideWays.state && difx < 370 && difx > -370) {
             explode();
@@ -769,14 +769,14 @@ function run(delta) {
           }
         }
 
-        if (type == 2) {
+        if (type === 2) {
           // 1/4 hole down
-          if (!sideWays.state && mesh.rotation.y == 0 && (xwing.position.y > -240 || xwing.position.x > -210)) {
+          if (!sideWays.state && mesh.rotation.y === 0 && (xwing.position.y > -240 || xwing.position.x > -210)) {
             explode();
             isDead = true;
             return;
           }
-          if (!sideWays.state && mesh.rotation.y == Math.PI && (xwing.position.y > -240 || xwing.position.x < 210)) {
+          if (!sideWays.state && mesh.rotation.y === Math.PI && (xwing.position.y > -240 || xwing.position.x < 210)) {
             explode();
             isDead = true;
             return;
@@ -788,14 +788,14 @@ function run(delta) {
           }
         }
 
-        if (type == 3) {
+        if (type === 3) {
           // 1/4 hole up
-          if (!sideWays.state && mesh.rotation.y == 0 && (xwing.position.y < 220 || xwing.position.x > -210)) {
+          if (!sideWays.state && mesh.rotation.y === 0 && (xwing.position.y < 220 || xwing.position.x > -210)) {
             explode();
             isDead = true;
             return;
           }
-          if (!sideWays.state && mesh.rotation.y == Math.PI && (xwing.position.y < 220 || xwing.position.x < 210)) {
+          if (!sideWays.state && mesh.rotation.y === Math.PI && (xwing.position.y < 220 || xwing.position.x < 210)) {
             explode();
             isDead = true;
             return;
@@ -1071,7 +1071,7 @@ function loop() {
   delta = time - oldTime;
   oldTime = time;
 
-  if (isNaN(delta) || delta > 1000 || delta == 0) {
+  if (isNaN(delta) || delta > 1000 || delta === 0) {
     delta = 1000 / 60;
   }
 
