@@ -93,7 +93,6 @@ THREE.EffectComposer.prototype = {
 };
 
 // shared fullscreen quad scene
-
 THREE.EffectComposer.geometry = new THREE.PlaneGeometry(1, 1);
 
 THREE.EffectComposer.quad = new THREE.Mesh(THREE.EffectComposer.geometry, null);

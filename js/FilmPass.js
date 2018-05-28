@@ -1,14 +1,10 @@
 THREE.FilmPass = function FilmPass(noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale) {
   const shader = THREE.ShaderExtras.film;
-
   this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-
   this.material = new THREE.MeshShaderMaterial({
-
     uniforms: this.uniforms,
     vertexShader: shader.vertexShader,
     fragmentShader: shader.fragmentShader
-
   });
 
   if (grayscale !== undefined)	this.uniforms.grayscale.value = grayscale;

@@ -244,7 +244,7 @@ THREE.ShaderExtras = {
       aspect: { type: 'f', value: 1.0 },
       aperture: { type: 'f', value: 0.025 },
       maxblur: { type: 'f', value: 1.0 }
-			  },
+		},
 
     vertexShader: [
 
