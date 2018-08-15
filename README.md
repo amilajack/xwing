@@ -1,5 +1,8 @@
 xwing
 =====
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/amilajack/xwing.svg)](https://greenkeeper.io/)
+
 A WebGL game powered by three.js. The original code was from [moxiecode.com](http://oos.moxiecode.com/js_webgl/xwing/)
 
 See the [live demo here](https://amilajack.github.io/xwing/)
