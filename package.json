@@ -15,6 +15,7 @@
   "scripts": {
     "lint": "eslint ./js --ignore-path .gitignore",
     "lint-fix": "yarn lint --fix",
-    "start": "http-server ."
+    "start": "http-server .",
+    "test": "yarn lint"
   }
 }
