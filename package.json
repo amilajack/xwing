@@ -7,10 +7,11 @@
   "license": "MIT",
   "dependencies": {},
   "devDependencies": {
-    "eslint": "^4.19.1",
-    "eslint-config-bliss": "^1.0.21",
+    "eslint": "^5.5.0",
+    "eslint-config-bliss": "^2.2.0",
     "http-server": "^0.11.1",
-    "parcel": "^1.8.1"
+    "parcel": "^1.9.7",
+    "testcafe": "^0.21.1"
   },
   "scripts": {
     "lint": "eslint ./js --ignore-path .gitignore",
