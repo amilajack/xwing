@@ -9,14 +9,16 @@
   "devDependencies": {
     "eslint": "^5.5.0",
     "eslint-config-bliss": "^2.2.0",
+    "express": "^4.16.3",
     "http-server": "^0.11.1",
     "parcel": "^1.9.7",
     "testcafe": "^0.21.1"
   },
   "scripts": {
+    "e2e": "testcafe chrome ./test/index.e2e.js",
     "lint": "eslint ./js --ignore-path .gitignore",
     "lint-fix": "yarn lint --fix",
     "start": "http-server .",
-    "test": "yarn lint"
+    "test": "yarn e2e"
   }
 }
