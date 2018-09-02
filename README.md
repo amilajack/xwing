@@ -1,5 +1,7 @@
 xwing
 =====
+[![Build Status](https://travis-ci.com/amilajack/xwing.svg?branch=master)](https://travis-ci.com/amilajack/xwing)
+
 A WebGL game powered by three.js. The original code was from [moxiecode.com](http://oos.moxiecode.com/js_webgl/xwing/)
 
 See the [live demo here](https://amilajack.github.io/xwing/)
