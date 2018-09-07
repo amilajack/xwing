@@ -13,9 +13,9 @@ function toggleSound(bool) {
   soundOn = bool;
 
   if (!soundOn) {
-    worldMusic.pause();
+    // worldMusic.pause();
   } else {
-    worldMusic.play();
+    // worldMusic.play();
   }
 }
 
@@ -35,7 +35,7 @@ function playSound(id, vol) {
       audiochannels[a].channel.src = id.src;
       audiochannels[a].channel.load();
       audiochannels[a].channel.volume = volume;
-      audiochannels[a].channel.play();
+      // audiochannels[a].channel.play();
       break;
     }
   }
@@ -50,4 +50,4 @@ window.explodeSound = explodeSound;
 const worldMusic = new Audio('../sound/music.ogg');
 worldMusic.volume = 0.1;
 worldMusic.loop = true;
-worldMusic.play();
+// worldMusic.play();
