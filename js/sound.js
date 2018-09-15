@@ -42,10 +42,11 @@ function playSound(id, vol) {
 }
 
 // sounds
-// const blasterSound = new Audio('../sound/blaster.ogg');
+const blasterSound = new Audio('../sound/blaster.ogg');
 const explodeSound = new Audio('../sound/explode.ogg');
 
 window.explodeSound = explodeSound;
+window.blasterSound = blasterSound;
 
 const worldMusic = new Audio('../sound/music.ogg');
 worldMusic.volume = 0.1;

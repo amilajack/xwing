@@ -983,7 +983,7 @@ function fire() {
     return;
   }
 
-  playSound(blasterSound, 0.03);
+  playSound(window.blasterSound, 0.03);
 
   lastFireTime = time;
 
