@@ -70,7 +70,8 @@ function init() {
   container.id = 'container';
   document.body.appendChild(container);
 
-  touchDevice = ('ontouchstart' in document.getElementById('container')) || (navigator.userAgent.match(/ipad|iphone|android/i) != null);
+  touchDevice = 'ontouchstart' in document.getElementById('container')
+    || navigator.userAgent.match(/ipad|iphone|android/i) != null;
   if (touchDevice) sizeRatio = 3;
   if (touchDevice) postprocessing = false;
 
@@ -93,8 +94,15 @@ function init() {
 
   const loadingImage = THREE.ImageUtils.loadTexture('img/loading.png');
 
-  loadingSprite = new THREE.Sprite({ map: loadingImage, useScreenCoordinates: true });
-  loadingSprite.position.set(window.innerWidth >> 1, (window.innerHeight >> 1) - 20, 1);
+  loadingSprite = new THREE.Sprite({
+    map: loadingImage,
+    useScreenCoordinates: true
+  });
+  loadingSprite.position.set(
+    window.innerWidth >> 1,
+    (window.innerHeight >> 1) - 20,
+    1
+  );
   scene.addChild(loadingSprite);
 
   // Lights
@@ -122,7 +130,7 @@ function init() {
 
   const laser = new THREE.CubeGeometry(6, 800, 6);
 
-  var material = new THREE.MeshBasicMaterial({ color: 0xf43b3c, opacity: 0.5 });
+  const material = new THREE.MeshBasicMaterial({ color: 0xf43b3c, opacity: 0.5 });
 
   laser0Mesh = new THREE.Mesh(laser, material);
   laser0Mesh.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
@@ -149,13 +157,22 @@ function init() {
   const geometry = new THREE.Geometry();
 
   for (i = 0; i < 1000; i++) {
-    const vector = new THREE.Vector3((Math.random() * 10000) - 5000, (Math.random() * 400) - 400, (Math.random() * 20000) - 10000);
+    const vector = new THREE.Vector3(
+      Math.random() * 10000 - 5000,
+      Math.random() * 400 - 400,
+      Math.random() * 20000 - 10000
+    );
     geometry.vertices.push(new THREE.Vertex(vector));
   }
 
   const particleImage = THREE.ImageUtils.loadTexture('img/star.png');
   const particleMaterial = new THREE.ParticleBasicMaterial({
-    size: 48, map: particleImage, opacity: 1.0, transparent: false, depthTest: true, blending: THREE.NormalBlending
+    size: 48,
+    map: particleImage,
+    opacity: 1.0,
+    transparent: false,
+    depthTest: true,
+    blending: THREE.NormalBlending
   });
 
   particles = new THREE.ParticleSystem(geometry, particleMaterial);
@@ -170,34 +187,47 @@ function init() {
   const numArray = [4, 3, 1, 1];
 
   // Obstacles
-  for (var i = 0; i < 4; ++i) {
-    var material = new THREE.MeshPhongMaterial({
-      color: 0x111111, ambient: 0x222222, specular: 0x000000, shininess: 100, shading: THREE.SmoothShading
+  for (let i = 0; i < 4; ++i) {
+    const material = new THREE.MeshPhongMaterial({
+      color: 0x111111,
+      ambient: 0x222222,
+      specular: 0x000000,
+      shininess: 100,
+      shading: THREE.SmoothShading
     });
+    let box;
     if (i === 0) {
-      var box = new THREE.CubeGeometry(1200, 300, 220);
+      box = new THREE.CubeGeometry(1200, 300, 220);
       // extras
-      var inbox = new THREE.CubeGeometry(260, 260, 260);
-      for (var j = 0; j < 12; ++j) {
-        var inmesh = new THREE.Mesh(inbox, material);
-        inmesh.position.set((Math.random() * 1200) - 600, (Math.random() * 100) - 50, (Math.random() * 100) - 50);
-        inmesh.rotation.x = (Math.random() * 0.4) - 0.2;
+      const inbox = new THREE.CubeGeometry(260, 260, 260);
+      for (let j = 0; j < 12; ++j) {
+        const inmesh = new THREE.Mesh(inbox, material);
+        inmesh.position.set(
+          Math.random() * 1200 - 600,
+          Math.random() * 100 - 50,
+          Math.random() * 100 - 50
+        );
+        inmesh.rotation.x = Math.random() * 0.4 - 0.2;
         THREE.GeometryUtils.merge(box, inmesh);
       }
       box.computeFaceNormals();
     } else if (i === 1) {
-      var box = new THREE.CubeGeometry(450, 1200, 220);
+      box = new THREE.CubeGeometry(450, 1200, 220);
       // extras
-      var inbox = new THREE.CubeGeometry(260, 260, 260);
-      for (var j = 0; j < 12; ++j) {
-        var inmesh = new THREE.Mesh(inbox, material);
-        inmesh.position.set((Math.random() * 260) - 130, (Math.random() * 1000) - 500, (Math.random() * 100) - 50);
-        inmesh.rotation.x = (Math.random() * 0.4) - 0.2;
+      const inbox = new THREE.CubeGeometry(260, 260, 260);
+      for (let j = 0; j < 12; ++j) {
+        const inmesh = new THREE.Mesh(inbox, material);
+        inmesh.position.set(
+          Math.random() * 260 - 130,
+          Math.random() * 1000 - 500,
+          Math.random() * 100 - 50
+        );
+        inmesh.rotation.x = Math.random() * 0.4 - 0.2;
         THREE.GeometryUtils.merge(box, inmesh);
       }
       box.computeFaceNormals();
     } else if (i === 2 || i === 3) {
-      var box = new THREE.CubeGeometry(1200, 800, 220);
+      box = new THREE.CubeGeometry(1200, 800, 220);
       const extrabox = new THREE.CubeGeometry(600, 600, 220);
       const extramesh = new THREE.Mesh(extrabox, material);
       if (i === 2) {
@@ -207,33 +237,45 @@ function init() {
       }
       THREE.GeometryUtils.merge(box, extramesh);
       // extras
-      var inbox = new THREE.CubeGeometry(260, 260, 260);
-      for (var j = 0; j < 20; ++j) {
-        var inmesh = new THREE.Mesh(inbox, material);
-        inmesh.position.set((Math.random() * 1000) - 500, (Math.random() * 600) - 300, (Math.random() * 100) - 50);
-        inmesh.rotation.x = (Math.random() * 0.4) - 0.2;
+      const inbox = new THREE.CubeGeometry(260, 260, 260);
+      for (let j = 0; j < 20; ++j) {
+        const inmesh = new THREE.Mesh(inbox, material);
+        inmesh.position.set(
+          Math.random() * 1000 - 500,
+          Math.random() * 600 - 300,
+          Math.random() * 100 - 50
+        );
+        inmesh.rotation.x = Math.random() * 0.4 - 0.2;
         THREE.GeometryUtils.merge(box, inmesh);
       }
-      for (var j = 0; j < 8; ++j) {
-        var inmesh = new THREE.Mesh(inbox, material);
+      for (let j = 0; j < 8; ++j) {
+        const inmesh = new THREE.Mesh(inbox, material);
         if (i === 2) {
-          inmesh.position.set(((Math.random() * 300) - 150) + 300, ((Math.random() * 300) - 150) - 400, (Math.random() * 100) - 50);
+          inmesh.position.set(
+            Math.random() * 300 - 150 + 300,
+            Math.random() * 300 - 150 - 400,
+            Math.random() * 100 - 50
+          );
         } else {
-          inmesh.position.set(((Math.random() * 300) - 150) + 300, ((Math.random() * 300) - 150) + 400, (Math.random() * 100) - 50);
+          inmesh.position.set(
+            Math.random() * 300 - 150 + 300,
+            Math.random() * 300 - 150 + 400,
+            Math.random() * 100 - 50
+          );
         }
-        inmesh.rotation.x = (Math.random() * 0.4) - 0.2;
+        inmesh.rotation.x = Math.random() * 0.4 - 0.2;
         THREE.GeometryUtils.merge(box, inmesh);
       }
 
       box.computeFaceNormals();
     }
 
-    for (var j = 0; j < numArray[i]; ++j) {
+    for (let j = 0; j < numArray[i]; ++j) {
       const mesh = new THREE.Mesh(box, material);
       if (i === 0) {
-        mesh.position.y = (Math.random() * 900) - 400;
+        mesh.position.y = Math.random() * 900 - 400;
       } else if (i === 1) {
-        mesh.position.x = (Math.random() * 1200) - 600;
+        mesh.position.x = Math.random() * 1200 - 600;
       } else if (i === 2) {
         mesh.position.y = 200;
       } else if (i === 3) {
@@ -254,9 +296,15 @@ function init() {
 
   try {
     webglRenderer = new THREE.WebGLRenderer({
-      scene, clearColor: 0x000000, clearAlpha: 0.99, antialias: false
+      scene,
+      clearColor: 0x000000,
+      clearAlpha: 0.99,
+      antialias: false
     });
-    webglRenderer.setSize(window.innerWidth / sizeRatio, window.innerHeight / sizeRatio);
+    webglRenderer.setSize(
+      window.innerWidth / sizeRatio,
+      window.innerHeight / sizeRatio
+    );
 
     webglRenderer.autoClear = false;
 
@@ -286,7 +334,7 @@ function init() {
     }
   } catch (e) {
     // need webgl
-    document.getElementById('info').innerHTML = "<P><BR><B>Note.<\/B> You need a modern browser that supports WebGL for this to run the way it is intended.<BR>For example. <a href='http://www.google.com/landing/chrome/beta/' target='_blank'>Google Chrome 9+<\/a> or <a href='http://www.mozilla.com/firefox/beta/' target='_blank'>Firefox 4+<\/a>.<BR><BR>If you are already using one of those browsers and still see this message, it's possible that you<BR>have old blacklisted GPU drivers. Try updating the drivers for your graphic card.<BR>Or try to set a '--ignore-gpu-blacklist' switch for the browser.<\/P><CENTER><BR><img src='../img/WebGL_logo.png' border='0'><\/CENTER>";
+    document.getElementById('info').innerHTML = "<P><BR><B>Note.</B> You need a modern browser that supports WebGL for this to run the way it is intended.<BR>For example. <a href='http://www.google.com/landing/chrome/beta/' target='_blank'>Google Chrome 9+</a> or <a href='http://www.mozilla.com/firefox/beta/' target='_blank'>Firefox 4+</a>.<BR><BR>If you are already using one of those browsers and still see this message, it's possible that you<BR>have old blacklisted GPU drivers. Try updating the drivers for your graphic card.<BR>Or try to set a '--ignore-gpu-blacklist' switch for the browser.</P><CENTER><BR><img src='../img/WebGL_logo.png' border='0'></CENTER>";
     document.getElementById('info').style.display = 'block';
     return;
   }
@@ -297,7 +345,9 @@ function init() {
     const effectBloom = new THREE.BloomPass(0.75);
 
     const effectVignette = new THREE.ShaderPass(THREE.ShaderExtras.vignette);
-    effectVignette.uniforms.tDiffuse.texture = THREE.ImageUtils.loadTexture('img/Vignette_alpha.png');
+    effectVignette.uniforms.tDiffuse.texture = THREE.ImageUtils.loadTexture(
+      'img/Vignette_alpha.png'
+    );
 
     effectFocus = new THREE.ShaderPass(THREE.ShaderExtras.focus);
 
@@ -378,16 +428,26 @@ function addParticles() {
   const colorArray = [0xffffff, 0xfabe82, 0xe03809, 0xee9c64, 0x910300];
   const sizeArray = [48, 48, 48, 48, 64];
 
-  for (var i = 0; i < 15; ++i) {
+  for (let i = 0; i < 15; ++i) {
     const color = colorArray[i % colorArray.length];
     const size = sizeArray[i % sizeArray.length];
 
     const particleMaterial = new THREE.ParticleBasicMaterial({
-      color, size, map: particleImage, opacity: 1.0, transparent: true, depthTest: false, blending: THREE.AdditiveBlending
+      color,
+      size,
+      map: particleImage,
+      opacity: 1.0,
+      transparent: true,
+      depthTest: false,
+      blending: THREE.AdditiveBlending
     });
     particles = new THREE.ParticleSystem(geometry, particleMaterial);
 
-    particles.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    particles.rotation.set(
+      Math.random() * Math.PI,
+      Math.random() * Math.PI,
+      Math.random() * Math.PI
+    );
     particles.position.z = -500 + i;
     particles.scale.set(0.1, 0.1, 0.1);
     particles.visible = false;
@@ -400,7 +460,11 @@ function addParticles() {
 
 function trenchLoaded(geometry) {
   const material = new THREE.MeshPhongMaterial({
-    color: 0x111111, ambient: 0x222222, specular: 0x000000, shininess: 100, shading: THREE.SmoothShading
+    color: 0x111111,
+    ambient: 0x222222,
+    specular: 0x000000,
+    shininess: 100,
+    shading: THREE.SmoothShading
   });
 
   for (let i = 0; i < numOfTrench; ++i) {
@@ -408,7 +472,7 @@ function trenchLoaded(geometry) {
 
     const scale = 200;
     mesh.scale.set(scale, scale * 1.6, scale * 1.6);
-    mesh.position.set(0, 0, (-i * trenchLength) - (trenchLength / 2));
+    mesh.position.set(0, 0, -i * trenchLength - trenchLength / 2);
     mesh.rotation.set(0, Math.PI / 2, 0);
 
     mesh.castShadow = false;
@@ -428,7 +492,7 @@ function xwingLoaded(geometry) {
 
   ship = new THREE.Mesh(geometry, material);
 
-  var scale = 0.8;
+  const scale = 0.8;
   ship.scale.set(scale, scale, scale);
   xwing.position.set(0, 0, -700);
   ship.rotation.set(0, Math.PI / 2, 0);
@@ -441,29 +505,29 @@ function xwingLoaded(geometry) {
 
   // thrust
   const thrustImage = THREE.ImageUtils.loadTexture('img/thrust.png');
-  var scale = 0.25;
+  const scale2 = 0.25;
 
   thrust0 = new THREE.Sprite({ map: thrustImage, useScreenCoordinates: false });
   thrust0.position.set(-175, 25, -42);
-  thrust0.scale.set(scale, scale, scale);
+  thrust0.scale.set(scale2, scale2, scale2);
   thrust0.blending = THREE.AdditiveBlending;
   ship.addChild(thrust0);
 
   thrust1 = new THREE.Sprite({ map: thrustImage, useScreenCoordinates: false });
   thrust1.position.set(-175, 25, 42);
-  thrust1.scale.set(scale, scale, scale);
+  thrust1.scale.set(scale2, scale2, scale2);
   thrust1.blending = THREE.AdditiveBlending;
   ship.addChild(thrust1);
 
   thrust2 = new THREE.Sprite({ map: thrustImage, useScreenCoordinates: false });
   thrust2.position.set(-175, -23, -42);
-  thrust2.scale.set(scale, scale, scale);
+  thrust2.scale.set(scale2, scale2, scale2);
   thrust2.blending = THREE.AdditiveBlending;
   ship.addChild(thrust2);
 
   thrust3 = new THREE.Sprite({ map: thrustImage, useScreenCoordinates: false });
   thrust3.position.set(-175, -23, 42);
-  thrust3.scale.set(scale, scale, scale);
+  thrust3.scale.set(scale2, scale2, scale2);
   thrust3.blending = THREE.AdditiveBlending;
   ship.addChild(thrust3);
 
@@ -503,8 +567,12 @@ function showInstruction(loadingComplete) {
   }
   instructionbox.innerHTML += "<BR><BR><img src='img/instructions.png'>";
   instructionbox.style.display = 'block';
-  instructionbox.style.marginLeft = `-${parseInt(instructionbox.offsetWidth / 2)}px`;
-  instructionbox.style.marginTop = `-${parseInt(instructionbox.offsetHeight / 2)}px`;
+  instructionbox.style.marginLeft = `-${parseInt(
+    instructionbox.offsetWidth / 2
+  )}px`;
+  instructionbox.style.marginTop = `-${parseInt(
+    instructionbox.offsetHeight / 2
+  )}px`;
 }
 
 function hideInstruction() {
@@ -543,8 +611,8 @@ function onTouchMove(event) {
   const windowHalfX = window.innerWidth >> 1;
   const windowHalfY = window.innerHeight >> 1;
 
-  mouseX = (event.touches[0].clientX - windowHalfX);
-  mouseY = (event.touches[0].clientY - windowHalfY);
+  mouseX = event.touches[0].clientX - windowHalfX;
+  mouseY = event.touches[0].clientY - windowHalfY;
 
   mouseXpercent = mouseX / (window.innerWidth / 2.3);
   mouseYpercent = mouseY / (window.innerHeight / 2.3);
@@ -561,8 +629,8 @@ function onDocumentMouseMove(event) {
   const windowHalfX = window.innerWidth >> 1;
   const windowHalfY = window.innerHeight >> 1;
 
-  mouseX = (event.clientX - windowHalfX);
-  mouseY = (event.clientY - windowHalfY);
+  mouseX = event.clientX - windowHalfX;
+  mouseY = event.clientY - windowHalfY;
 
   mouseXpercent = mouseX / (window.innerWidth / 2.3);
   mouseYpercent = mouseY / (window.innerHeight / 2.3);
@@ -617,22 +685,44 @@ function onDocumentKeyDown(event) {
   }
 
   switch (event.keyCode) {
-    case 37: leftIsDown = true; break;
-    case 38: upIsDown = true; break;
-    case 39: rightIsDown = true; break;
-    case 40: downIsDown = true; break;
-    case 17: ctrlIsDown = true; break;
-    case 32: changeRotation(); break;
+    case 37:
+      leftIsDown = true;
+      break;
+    case 38:
+      upIsDown = true;
+      break;
+    case 39:
+      rightIsDown = true;
+      break;
+    case 40:
+      downIsDown = true;
+      break;
+    case 17:
+      ctrlIsDown = true;
+      break;
+    case 32:
+      changeRotation();
+      break;
   }
 }
 
 function onDocumentKeyUp(event) {
   switch (event.keyCode) {
-    case 37: leftIsDown = false; break;
-    case 38: upIsDown = false; break;
-    case 39: rightIsDown = false; break;
-    case 40: downIsDown = false; break;
-    case 17: ctrlIsDown = false; break;
+    case 37:
+      leftIsDown = false;
+      break;
+    case 38:
+      upIsDown = false;
+      break;
+    case 39:
+      rightIsDown = false;
+      break;
+    case 40:
+      downIsDown = false;
+      break;
+    case 17:
+      ctrlIsDown = false;
+      break;
   }
 }
 
@@ -645,14 +735,14 @@ function changeRotation() {
       direction *= -1;
     }
 
-    var rotatetween = new TWEEN.Tween(sideWays)
+    const rotatetween = new TWEEN.Tween(sideWays)
       .to({ rotation: direction }, 800)
       .easing(TWEEN.Easing.Exponential.EaseOut);
     rotatetween.start();
   } else {
     sideWays.state = false;
 
-    var rotatetween = new TWEEN.Tween(sideWays)
+    const rotatetween = new TWEEN.Tween(sideWays)
       .to({ rotation: 0 }, 800)
       .easing(TWEEN.Easing.Exponential.EaseOut);
     rotatetween.start();
@@ -686,11 +776,11 @@ function spawnNewObstacle() {
   const type = o[0].type;
 
   // add mesh
-  mesh.position.z = (-(numOfTrench - 1) * trenchLength) - (trenchLength / 2);
+  mesh.position.z = -(numOfTrench - 1) * trenchLength - trenchLength / 2;
   if (type === 0) {
-    mesh.position.y = (Math.random() * 900) - 400;
+    mesh.position.y = Math.random() * 900 - 400;
   } else if (type === 1) {
-    mesh.position.x = (Math.random() * 1200) - 600;
+    mesh.position.x = Math.random() * 1200 - 600;
   } else if (type === 2 || type === 3) {
     // random flip
     let rot = 0;
@@ -706,12 +796,12 @@ function run(delta) {
   }
 
   // trenches
-  for (var i = 0; i < trenchArray.length; ++i) {
-    var mesh = trenchArray[i];
+  for (let i = 0; i < trenchArray.length; ++i) {
+    const mesh = trenchArray[i];
     mesh.position.z += speed;
 
     if (mesh.position.z > camera.position.z + trenchLength / 2) {
-      mesh.position.z -= ((numOfTrench) * trenchLength);
+      mesh.position.z -= numOfTrench * trenchLength;
 
       if (obstacleArray.length < 4) {
         spawnNewObstacle();
@@ -720,9 +810,9 @@ function run(delta) {
   }
 
   // obstacles
-  for (var i = 0; i < obstacleArray.length; ++i) {
+  for (let i = 0; i < obstacleArray.length; ++i) {
     const type = obstacleArray[i].type;
-    var mesh = obstacleArray[i].mesh;
+    const mesh = obstacleArray[i].mesh;
     mesh.position.z += speed;
 
     // respawn / remove
@@ -738,8 +828,8 @@ function run(delta) {
       const difz = xwing.position.z - mesh.position.z;
 
       if (difz < 170 && difz > -170) {
-        var dify = xwing.position.y - mesh.position.y;
-        var difx = xwing.position.x - mesh.position.x;
+        const dify = xwing.position.y - mesh.position.y;
+        const difx = xwing.position.x - mesh.position.x;
 
         if (type === 0) {
           // horizontal bar
@@ -771,12 +861,20 @@ function run(delta) {
 
         if (type === 2) {
           // 1/4 hole down
-          if (!sideWays.state && mesh.rotation.y === 0 && (xwing.position.y > -240 || xwing.position.x > -210)) {
+          if (
+            !sideWays.state
+            && mesh.rotation.y === 0
+            && (xwing.position.y > -240 || xwing.position.x > -210)
+          ) {
             explode();
             isDead = true;
             return;
           }
-          if (!sideWays.state && mesh.rotation.y === Math.PI && (xwing.position.y > -240 || xwing.position.x < 210)) {
+          if (
+            !sideWays.state
+            && mesh.rotation.y === Math.PI
+            && (xwing.position.y > -240 || xwing.position.x < 210)
+          ) {
             explode();
             isDead = true;
             return;
@@ -790,12 +888,20 @@ function run(delta) {
 
         if (type === 3) {
           // 1/4 hole up
-          if (!sideWays.state && mesh.rotation.y === 0 && (xwing.position.y < 220 || xwing.position.x > -210)) {
+          if (
+            !sideWays.state
+            && mesh.rotation.y === 0
+            && (xwing.position.y < 220 || xwing.position.x > -210)
+          ) {
             explode();
             isDead = true;
             return;
           }
-          if (!sideWays.state && mesh.rotation.y === Math.PI && (xwing.position.y < 220 || xwing.position.x < 210)) {
+          if (
+            !sideWays.state
+            && mesh.rotation.y === Math.PI
+            && (xwing.position.y < 220 || xwing.position.x < 210)
+          ) {
             explode();
             isDead = true;
             return;
@@ -821,7 +927,6 @@ function run(delta) {
   if (mouseYpercent < -1) mouseYpercent = -1;
   if (mouseYpercent > 1) mouseYpercent = 1;
 
-
   // xwing
   if (!xwing) {
     return;
@@ -829,18 +934,18 @@ function run(delta) {
 
   const optimalDivider = delta / 16;
 
-  const smoothing = Math.max(8, (12 / optimalDivider));
+  const smoothing = Math.max(8, 12 / optimalDivider);
 
-  var tox = mouseXpercent * 380;
-  var toy = -(mouseYpercent * 350) + 30;
+  let tox = mouseXpercent * 380;
+  let toy = -(mouseYpercent * 350) + 30;
 
   if (sideWays.state) {
     tox = mouseXpercent * 480;
     toy = -(mouseYpercent * 250) + 30;
   }
 
-  var difx = (tox - xwing.position.x) / smoothing;
-  var dify = (toy - xwing.position.y) / smoothing;
+  let difx = (tox - xwing.position.x) / smoothing;
+  let dify = (toy - xwing.position.y) / smoothing;
 
   xwing.position.x += difx;
   xwing.position.y += dify;
@@ -898,10 +1003,10 @@ function run(delta) {
   }
 
   // camera
-  var tox = xwing.position.x;
-  var toy = xwing.position.y + 50;
+  const tox1 = xwing.position.x;
+  toy = xwing.position.y + 50;
 
-  var difx = (tox - camera.position.x) / (smoothing * 2);
+  difx = (tox1 - camera.position.x) / (smoothing * 2);
 
   camera.position.x += difx;
   camera.position.y += (toy - camera.position.y) / (smoothing * 2);
@@ -933,12 +1038,26 @@ function explode() {
     alphatween.start();
 
     const rotatetween = new TWEEN.Tween(particles.rotation)
-      .to({ x: particles.rotation.x + 0.75, y: particles.rotation.y + 0.75, z: particles.rotation.z + 0.75 }, 1700)
+      .to(
+        {
+          x: particles.rotation.x + 0.75,
+          y: particles.rotation.y + 0.75,
+          z: particles.rotation.z + 0.75
+        },
+        1700
+      )
       .easing(TWEEN.Easing.Exponential.EaseOut);
     rotatetween.start();
 
     const positiontween = new TWEEN.Tween(particles.position)
-      .to({ x: camera.position.x, y: camera.position.y + 30, z: particles.position.z + 500 }, 2500)
+      .to(
+        {
+          x: camera.position.x,
+          y: camera.position.y + 30,
+          z: particles.position.z + 500
+        },
+        2500
+      )
       .easing(TWEEN.Easing.Exponential.EaseOut);
     positiontween.start();
   }
@@ -964,7 +1083,11 @@ function explodeDone() {
     const particles = particleArray[i].p;
     const material = particleArray[i].m;
 
-    particles.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, Math.random() * Math.PI);
+    particles.rotation.set(
+      Math.random() * Math.PI,
+      Math.random() * Math.PI,
+      Math.random() * Math.PI
+    );
     particles.scale.set(0.1, 0.1, 0.1);
     material.opacity = 1;
     particles.visible = false;
@@ -979,7 +1102,7 @@ function explodeDone() {
 }
 
 function fire() {
-  if (time < (lastFireTime + 200)) {
+  if (time < lastFireTime + 200) {
     return;
   }
 
@@ -1038,7 +1161,7 @@ function fire() {
     .onComplete(removeLasers);
   tween3.start();
 
-  const toz = pointLight.position.z - (distance * 2);
+  const toz = pointLight.position.z - distance * 2;
   const tweenLight = new TWEEN.Tween(pointLight.position)
     .to({ z: toz }, tweentime * 2)
     .easing(TWEEN.Easing.Linear.EaseNone)
@@ -1047,7 +1170,7 @@ function fire() {
 }
 
 function removeLasers() {
-  if (time > (lastFireTime + 299)) {
+  if (time > lastFireTime + 299) {
     laser0Mesh.visible = false;
     laser1Mesh.visible = false;
     laser2Mesh.visible = false;
@@ -1056,7 +1179,7 @@ function removeLasers() {
 }
 
 function removeLight() {
-  if (time > (lastFireTime + 599)) {
+  if (time > lastFireTime + 599) {
     pointLight.position.y = 5000;
   }
 }
@@ -1086,8 +1209,8 @@ function loop() {
 
     // shake camera
     if (time < shakeCameraTimer + 1500) {
-      const expo = ((shakeCameraTimer + 1500) - time) / 1500;
-      camera.up.x = ((Math.random() * 0.2) - 0.1) * expo;
+      const expo = (shakeCameraTimer + 1500 - time) / 1500;
+      camera.up.x = (Math.random() * 0.2 - 0.1) * expo;
 
       if (postprocessing) {
         effectFocus.uniforms.sampleDistance.value = 0.85 * expo;
@@ -1097,12 +1220,20 @@ function loop() {
 
     run(delta);
   } else if (loadingSprite) {
-    loadingSprite.position.set(window.innerWidth / sizeRatio >> 1, (window.innerHeight / sizeRatio >> 1) - 20, 0);
+    loadingSprite.position.set(
+      (window.innerWidth / sizeRatio) >> 1,
+      ((window.innerHeight / sizeRatio) >> 1) - 20,
+      0
+    );
     loadingSprite.rotation -= 0.08;
   }
 
   if (bgSprite) {
-    bgSprite.position.set(window.innerWidth / sizeRatio >> 1, window.innerHeight / sizeRatio >> 1, 0);
+    bgSprite.position.set(
+      (window.innerWidth / sizeRatio) >> 1,
+      (window.innerHeight / sizeRatio) >> 1,
+      0
+    );
   }
 
   TWEEN.update();
@@ -1117,7 +1248,13 @@ function loop() {
   }
 }
 
-document.addEventListener('contextmenu', (event) => { event.preventDefault(); }, false);
+document.addEventListener(
+  'contextmenu',
+  (event) => {
+    event.preventDefault();
+  },
+  false
+);
 document.addEventListener('mousemove', onDocumentMouseMove, false);
 document.addEventListener('mousedown', onDocumentMouseDown, false);
 document.addEventListener('mouseup', onDocumentMouseUp, false);
