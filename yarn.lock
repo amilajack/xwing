@@ -4550,9 +4550,9 @@ pako@~1.0.5:
   version "1.0.6"
   resolved "https://registry.yarnpkg.com/pako/-/pako-1.0.6.tgz#0101211baa70c4bca4a0f63f2206e97b7dfaf258"
 
-parcel@^1.10.1:
-  version "1.10.1"
-  resolved "https://registry.yarnpkg.com/parcel/-/parcel-1.10.1.tgz#ba310f2cf02c786704766234557a8f53e284e3f6"
+parcel@^1.10.2:
+  version "1.10.2"
+  resolved "https://registry.yarnpkg.com/parcel/-/parcel-1.10.2.tgz#0943b95634c25b719085d4ea5d9c8abdf7f557f4"
   dependencies:
     "@babel/code-frame" "^7.0.0"
     "@babel/core" "^7.0.0"
