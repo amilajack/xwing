@@ -11,7 +11,7 @@
     "eslint-config-bliss": "^2.2.0",
     "express": "^4.16.4",
     "http-server": "^0.11.1",
-    "parcel": "^1.10.2",
+    "parcel": "^1.10.3",
     "testcafe": "^0.22.0"
   },
   "scripts": {
