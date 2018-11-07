@@ -828,17 +828,17 @@ function run(delta) {
       const difz = xwing.position.z - mesh.position.z;
 
       if (difz < 170 && difz > -170) {
-        const dify = xwing.position.y - mesh.position.y;
-        const difx = xwing.position.x - mesh.position.x;
+        const difY = xwing.position.y - mesh.position.y;
+        const difX = xwing.position.x - mesh.position.x;
 
         if (type === 0) {
           // horizontal bar
-          if (!sideWays.state && dify < 210 && dify > -210) {
+          if (!sideWays.state && difY < 210 && difY > -210) {
             explode();
             isDead = true;
             return;
           }
-          if (sideWays.state && dify < 370 && dify > -370) {
+          if (sideWays.state && difY < 370 && difY > -370) {
             explode();
             isDead = true;
             return;
@@ -847,12 +847,12 @@ function run(delta) {
 
         if (type === 1) {
           // vertical bar
-          if (!sideWays.state && difx < 370 && difx > -370) {
+          if (!sideWays.state && difX < 370 && difX > -370) {
             explode();
             isDead = true;
             return;
           }
-          if (sideWays.state && difx < 210 && difx > -210) {
+          if (sideWays.state && difX < 210 && difX > -210) {
             explode();
             isDead = true;
             return;
@@ -936,34 +936,32 @@ function run(delta) {
 
   const smoothing = Math.max(8, 12 / optimalDivider);
 
-  let tox = mouseXpercent * 380;
-  let toy = -(mouseYpercent * 350) + 30;
+  let toX = mouseXpercent * 380;
+  let toY = -(mouseYpercent * 350) + 30;
 
   if (sideWays.state) {
-    tox = mouseXpercent * 480;
-    toy = -(mouseYpercent * 250) + 30;
+    toX = mouseXpercent * 480;
+    toY = -(mouseYpercent * 250) + 30;
   }
 
-  let difx = (tox - xwing.position.x) / smoothing;
-  let dify = (toy - xwing.position.y) / smoothing;
+  let difX = (toX - xwing.position.x) / smoothing;
+  let difY = (toY - xwing.position.y) / smoothing;
 
-  xwing.position.x += difx;
-  xwing.position.y += dify;
+  xwing.position.x += difX;
+  xwing.position.y += difY;
 
-  difx = Math.min(difx, 10);
-  difx = Math.max(difx, -10);
-  dify = Math.min(dify, 10);
-  dify = Math.max(dify, -10);
+  difX = Math.min(difX, 10);
+  difX = Math.max(difX, -10);
+  difY = Math.min(difY, 10);
+  difY = Math.max(difY, -10);
 
-  xwing.rotation.x = dify / 40;
-  xwing.rotation.y = -(difx / 40);
-
-  xwing.rotation.z = -(difx / 40);
-
+  xwing.rotation.x = difY / 40;
+  xwing.rotation.y = -(difX / 40);
+  xwing.rotation.z = -(difX / 40);
   xwing.rotation.z += sideWays.rotation;
 
   // thrust
-  let opacity = (Math.abs(difx) + Math.abs(dify)) / 8;
+  let opacity = (Math.abs(difX) + Math.abs(difY)) / 8;
   opacity = Math.min(opacity, 1);
   opacity = Math.max(opacity, 0.3);
 
@@ -1003,15 +1001,15 @@ function run(delta) {
   }
 
   // camera
-  const tox1 = xwing.position.x;
-  toy = xwing.position.y + 50;
+  const toX1 = xwing.position.x;
+  toY = xwing.position.y + 50;
 
-  difx = (tox1 - camera.position.x) / (smoothing * 2);
+  difX = (toX1 - camera.position.x) / (smoothing * 2);
 
-  camera.position.x += difx;
-  camera.position.y += (toy - camera.position.y) / (smoothing * 2);
+  camera.position.x += difX;
+  camera.position.y += (toY - camera.position.y) / (smoothing * 2);
 
-  camera.up.x = -(difx / 100);
+  camera.up.x = -(difX / 100);
 }
 
 function explode() {
