@@ -1,12 +1,15 @@
 xwing
 =====
+
+<a href="https://amilajack.github.io/xwing/"><img src="./img/demo.gif" width="60%"></a>
+
+### A WebGL game powered by three.js
+
 [![Build Status](https://travis-ci.com/amilajack/xwing.svg?branch=master)](https://travis-ci.com/amilajack/xwing)
 
-A WebGL game powered by three.js
+## Play It!
 
-See the [live demo here](https://amilajack.github.io/xwing/)
-
-<a href="https://amilajack.github.io/xwing/"><img src="./img/demo.png" width="60%"></a>
+Play it at **[amilajack.github.io/xwing](https://amilajack.github.io/xwing/)**
 
 ## Setup
 *Note: this project requires `yarn`. If you don't have it, run `npm i -g yarn`*
