@@ -12,7 +12,7 @@
     "express": "^4.16.4",
     "http-server": "^0.11.1",
     "parcel": "^1.10.3",
-    "testcafe": "^0.23.0"
+    "testcafe": "^0.23.3"
   },
   "scripts": {
     "e2e": "testcafe chrome ./test/index.e2e.js",
