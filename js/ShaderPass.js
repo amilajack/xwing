@@ -1,25 +1,33 @@
-THREE.ShaderPass = function ShaderPass(shader, textureID) {
+// eslint-disable
+THREE.ShaderPass = function(shader, textureID) {
   this.textureID = (textureID !== undefined) ? textureID : 'tDiffuse';
   this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-  this.material = new THREE.MeshShaderMaterial({
+  this.material = new THREE.ShaderMaterial({
     uniforms: this.uniforms,
     vertexShader: shader.vertexShader,
     fragmentShader: shader.fragmentShader
   });
   this.renderToScreen = false;
   this.needsSwap = true;
+  this.enabled = true;
+  this.clear = false;
 };
 
 THREE.ShaderPass.prototype = {
-  render(renderer, writeBuffer, readBuffer, delta) {
-    this.uniforms[this.textureID].texture = readBuffer;
+  render: function(renderer, writeBuffer, readBuffer, delta) {
+    if (this.uniforms[this.textureID]) {
+      this.uniforms[this.textureID].value = readBuffer.texture;
+    }
 
-    THREE.EffectComposer.quad.materials[0] = this.material;
+    THREE.EffectComposer.quad.material = this.material;
 
     if (this.renderToScreen) {
-      renderer.render(THREE.EffectComposer.scene, THREE.EffectComposer.camera);
+      renderer.setRenderTarget(null);
     } else {
-      renderer.render(THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false);
+      renderer.setRenderTarget(writeBuffer);
+      if (this.clear) renderer.clear();
     }
+
+    renderer.render(THREE.EffectComposer.scene, THREE.EffectComposer.camera);
   }
 };

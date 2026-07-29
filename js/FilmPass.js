@@ -1,34 +1,35 @@
-THREE.FilmPass = function FilmPass(noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale) {
+// eslint-disable
+THREE.FilmPass = function(noiseIntensity, scanlinesIntensity, scanlinesCount, grayscale) {
   const shader = THREE.ShaderExtras.film;
   this.uniforms = THREE.UniformsUtils.clone(shader.uniforms);
-  this.material = new THREE.MeshShaderMaterial({
+  this.material = new THREE.ShaderMaterial({
     uniforms: this.uniforms,
     vertexShader: shader.vertexShader,
     fragmentShader: shader.fragmentShader
   });
 
-  if (grayscale !== undefined)	this.uniforms.grayscale.value = grayscale;
+  if (grayscale !== undefined) this.uniforms.grayscale.value = grayscale;
   if (noiseIntensity !== undefined) this.uniforms.nIntensity.value = noiseIntensity;
   if (scanlinesIntensity !== undefined) this.uniforms.sIntensity.value = scanlinesIntensity;
   if (scanlinesCount !== undefined) this.uniforms.sCount.value = scanlinesCount;
 
   this.renderToScreen = false;
   this.needsSwap = true;
+  this.enabled = true;
 };
 
 THREE.FilmPass.prototype = {
-
-  render(renderer, writeBuffer, readBuffer, delta) {
-    this.uniforms.tDiffuse.texture = readBuffer;
+  render: function(renderer, writeBuffer, readBuffer, delta) {
+    this.uniforms.tDiffuse.value = readBuffer.texture;
     this.uniforms.time.value += delta;
 
-    THREE.EffectComposer.quad.materials[0] = this.material;
+    THREE.EffectComposer.quad.material = this.material;
 
     if (this.renderToScreen) {
-      renderer.render(THREE.EffectComposer.scene, THREE.EffectComposer.camera);
+      renderer.setRenderTarget(null);
     } else {
-      renderer.render(THREE.EffectComposer.scene, THREE.EffectComposer.camera, writeBuffer, false);
+      renderer.setRenderTarget(writeBuffer);
     }
+    renderer.render(THREE.EffectComposer.scene, THREE.EffectComposer.camera);
   }
-
 };

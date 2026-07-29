@@ -54,8 +54,6 @@ let deadTimer = 0;
 let shakeCameraTimer = 0;
 let allLoaded = false;
 let started = false;
-let bgSprite;
-let loadingSprite;
 let score = 0;
 
 let composer;
@@ -64,6 +62,8 @@ let effectFocus;
 let touchDevice = false;
 let sizeRatio = 1;
 let postprocessing = true;
+
+const textureLoader = new THREE.TextureLoader();
 
 function init() {
   container = document.createElement('div');
@@ -77,76 +77,55 @@ function init() {
 
   const aspect = window.innerWidth / window.innerHeight;
 
-  camera = new THREE.Camera(50, aspect, 1, 100000);
+  camera = new THREE.PerspectiveCamera(50, aspect, 1, 100000);
   camera.position.y = -60;
-  camera.target.position.z = -1200;
 
   scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x000000, 20000, 25000);
 
-  // Loading
-  const bgImage = THREE.ImageUtils.loadTexture('img/black.png');
-
-  bgSprite = new THREE.Sprite({ map: bgImage, useScreenCoordinates: true });
-  bgSprite.position.set(window.innerWidth >> 1, window.innerHeight >> 1, 0);
-  bgSprite.scale.set(1000, 1000);
-  scene.addChild(bgSprite);
-
-  const loadingImage = THREE.ImageUtils.loadTexture('img/loading.png');
-
-  loadingSprite = new THREE.Sprite({
-    map: loadingImage,
-    useScreenCoordinates: true
-  });
-  loadingSprite.position.set(
-    window.innerWidth >> 1,
-    (window.innerHeight >> 1) - 20,
-    1
-  );
-  scene.addChild(loadingSprite);
-
   // Lights
   const ambient = new THREE.AmbientLight(0x111111);
-  scene.addLight(ambient);
+  scene.add(ambient);
 
   const light = new THREE.SpotLight(0x999999, 0.7, 0);
   light.position.set(-100, 1000, 1000);
   light.target.position.set(0, 0, -1000);
   light.castShadow = true;
-  scene.addLight(light);
+  scene.add(light);
+  scene.add(light.target);
 
   pointLight = new THREE.PointLight(0xf43b3c, 0.4, 5000);
   pointLight.position.set(0, -5000, -5000);
-  scene.addLight(pointLight);
+  scene.add(pointLight);
 
   // Models
-  loader = new THREE.JSONLoader();
-  loader.load({ model: './models/trench.js', callback: trenchLoaded });
+  loader = new THREE.LegacyModelLoader();
+  loader.load('./models/trench.js', trenchLoaded);
 
   // Lasers
   laserContainer = new THREE.Object3D();
   laserContainer.scale.set(0.8, 0.8, 0.8);
-  scene.addChild(laserContainer);
+  scene.add(laserContainer);
 
-  const laser = new THREE.CubeGeometry(6, 800, 6);
+  const laser = new THREE.BoxGeometry(6, 800, 6);
 
-  const material = new THREE.MeshBasicMaterial({ color: 0xf43b3c, opacity: 0.5 });
+  const material = new THREE.MeshBasicMaterial({ color: 0xf43b3c, opacity: 0.5, transparent: true });
 
   laser0Mesh = new THREE.Mesh(laser, material);
   laser0Mesh.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
-  laserContainer.addChild(laser0Mesh);
+  laserContainer.add(laser0Mesh);
 
   laser1Mesh = new THREE.Mesh(laser, material);
   laser1Mesh.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
-  laserContainer.addChild(laser1Mesh);
+  laserContainer.add(laser1Mesh);
 
   laser2Mesh = new THREE.Mesh(laser, material);
   laser2Mesh.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
-  laserContainer.addChild(laser2Mesh);
+  laserContainer.add(laser2Mesh);
 
   laser3Mesh = new THREE.Mesh(laser, material);
   laser3Mesh.rotation.set(-Math.PI / 2, 0, -Math.PI / 2);
-  laserContainer.addChild(laser3Mesh);
+  laserContainer.add(laser3Mesh);
 
   laser0Mesh.visible = false;
   laser1Mesh.visible = false;
@@ -154,19 +133,19 @@ function init() {
   laser3Mesh.visible = false;
 
   // Particles (stars)
-  const geometry = new THREE.Geometry();
-
-  for (i = 0; i < 1000; i++) {
-    const vector = new THREE.Vector3(
+  const starPositions = [];
+  for (let i = 0; i < 1000; i++) {
+    starPositions.push(
       Math.random() * 10000 - 5000,
       Math.random() * 400 - 400,
       Math.random() * 20000 - 10000
     );
-    geometry.vertices.push(new THREE.Vertex(vector));
   }
+  const starGeometry = new THREE.BufferGeometry();
+  starGeometry.setAttribute('position', new THREE.Float32BufferAttribute(starPositions, 3));
 
-  const particleImage = THREE.ImageUtils.loadTexture('img/star.png');
-  const particleMaterial = new THREE.ParticleBasicMaterial({
+  const particleImage = textureLoader.load('img/star.png');
+  const particleMaterial = new THREE.PointsMaterial({
     size: 48,
     map: particleImage,
     opacity: 1.0,
@@ -175,118 +154,80 @@ function init() {
     blending: THREE.NormalBlending
   });
 
-  particles = new THREE.ParticleSystem(geometry, particleMaterial);
+  const stars = new THREE.Points(starGeometry, particleMaterial);
+  stars.position.z = -12000;
+  stars.position.y = 2000;
+  scene.add(stars);
 
-  particles.position.z = -12000;
-  particles.position.y = 2000;
-
-  scene.addChild(particles);
-
-  // obstacle types
-  // horizontal wall, vertical wall, 1/4 passage down
+  // Obstacle types: horizontal wall, vertical wall, 1/4 passage down, 1/4 passage up
   const numArray = [4, 3, 1, 1];
 
-  // Obstacles
   for (let i = 0; i < 4; ++i) {
-    const material = new THREE.MeshPhongMaterial({
+    const obsMaterial = new THREE.MeshPhongMaterial({
       color: 0x111111,
-      ambient: 0x222222,
       specular: 0x000000,
-      shininess: 100,
-      shading: THREE.SmoothShading
+      shininess: 100
     });
-    let box;
-    if (i === 0) {
-      box = new THREE.CubeGeometry(1200, 300, 220);
-      // extras
-      const inbox = new THREE.CubeGeometry(260, 260, 260);
-      for (let j = 0; j < 12; ++j) {
-        const inmesh = new THREE.Mesh(inbox, material);
-        inmesh.position.set(
-          Math.random() * 1200 - 600,
-          Math.random() * 100 - 50,
-          Math.random() * 100 - 50
-        );
-        inmesh.rotation.x = Math.random() * 0.4 - 0.2;
-        THREE.GeometryUtils.merge(box, inmesh);
-      }
-      box.computeFaceNormals();
-    } else if (i === 1) {
-      box = new THREE.CubeGeometry(450, 1200, 220);
-      // extras
-      const inbox = new THREE.CubeGeometry(260, 260, 260);
-      for (let j = 0; j < 12; ++j) {
-        const inmesh = new THREE.Mesh(inbox, material);
-        inmesh.position.set(
-          Math.random() * 260 - 130,
-          Math.random() * 1000 - 500,
-          Math.random() * 100 - 50
-        );
-        inmesh.rotation.x = Math.random() * 0.4 - 0.2;
-        THREE.GeometryUtils.merge(box, inmesh);
-      }
-      box.computeFaceNormals();
-    } else if (i === 2 || i === 3) {
-      box = new THREE.CubeGeometry(1200, 800, 220);
-      const extrabox = new THREE.CubeGeometry(600, 600, 220);
-      const extramesh = new THREE.Mesh(extrabox, material);
-      if (i === 2) {
-        extramesh.position.set(300, -400, 0);
-      } else {
-        extramesh.position.set(300, 400, 0);
-      }
-      THREE.GeometryUtils.merge(box, extramesh);
-      // extras
-      const inbox = new THREE.CubeGeometry(260, 260, 260);
-      for (let j = 0; j < 20; ++j) {
-        const inmesh = new THREE.Mesh(inbox, material);
-        inmesh.position.set(
-          Math.random() * 1000 - 500,
-          Math.random() * 600 - 300,
-          Math.random() * 100 - 50
-        );
-        inmesh.rotation.x = Math.random() * 0.4 - 0.2;
-        THREE.GeometryUtils.merge(box, inmesh);
-      }
-      for (let j = 0; j < 8; ++j) {
-        const inmesh = new THREE.Mesh(inbox, material);
-        if (i === 2) {
-          inmesh.position.set(
-            Math.random() * 300 - 150 + 300,
-            Math.random() * 300 - 150 - 400,
-            Math.random() * 100 - 50
-          );
-        } else {
-          inmesh.position.set(
-            Math.random() * 300 - 150 + 300,
-            Math.random() * 300 - 150 + 400,
-            Math.random() * 100 - 50
-          );
-        }
-        inmesh.rotation.x = Math.random() * 0.4 - 0.2;
-        THREE.GeometryUtils.merge(box, inmesh);
-      }
-
-      box.computeFaceNormals();
-    }
 
     for (let j = 0; j < numArray[i]; ++j) {
-      const mesh = new THREE.Mesh(box, material);
+      const group = new THREE.Group();
+
       if (i === 0) {
-        mesh.position.y = Math.random() * 900 - 400;
+        // Horizontal wall
+        group.add(new THREE.Mesh(new THREE.BoxGeometry(1200, 300, 220), obsMaterial));
+        for (let k = 0; k < 12; ++k) {
+          const deco = new THREE.Mesh(new THREE.BoxGeometry(260, 260, 260), obsMaterial);
+          deco.position.set(
+            Math.random() * 1200 - 600,
+            Math.random() * 100 - 50,
+            Math.random() * 100 - 50
+          );
+          deco.rotation.x = Math.random() * 0.4 - 0.2;
+          group.add(deco);
+        }
+        group.position.y = Math.random() * 900 - 400;
       } else if (i === 1) {
-        mesh.position.x = Math.random() * 1200 - 600;
-      } else if (i === 2) {
-        mesh.position.y = 200;
-      } else if (i === 3) {
-        mesh.position.y = -200;
+        // Vertical wall
+        group.add(new THREE.Mesh(new THREE.BoxGeometry(450, 1200, 220), obsMaterial));
+        for (let k = 0; k < 12; ++k) {
+          const deco = new THREE.Mesh(new THREE.BoxGeometry(260, 260, 260), obsMaterial);
+          deco.position.set(
+            Math.random() * 260 - 130,
+            Math.random() * 1000 - 500,
+            Math.random() * 100 - 50
+          );
+          deco.rotation.x = Math.random() * 0.4 - 0.2;
+          group.add(deco);
+        }
+        group.position.x = Math.random() * 1200 - 600;
+      } else if (i === 2 || i === 3) {
+        // Quarter-passage obstacles
+        group.add(new THREE.Mesh(new THREE.BoxGeometry(1200, 800, 220), obsMaterial));
+        const extraMesh = new THREE.Mesh(new THREE.BoxGeometry(600, 600, 220), obsMaterial);
+        extraMesh.position.set(300, i === 2 ? -400 : 400, 0);
+        group.add(extraMesh);
+        for (let k = 0; k < 20; ++k) {
+          const deco = new THREE.Mesh(new THREE.BoxGeometry(260, 260, 260), obsMaterial);
+          deco.position.set(
+            Math.random() * 1000 - 500,
+            Math.random() * 600 - 300,
+            Math.random() * 100 - 50
+          );
+          deco.rotation.x = Math.random() * 0.4 - 0.2;
+          group.add(deco);
+        }
+        group.position.y = i === 2 ? 200 : -200;
       }
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      mesh.visible = false;
-      scene.addChild(mesh);
-      const o = { mesh, material, type: i };
-      obstaclePool.push(o);
+
+      group.traverse(function(child) {
+        if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+        }
+      });
+      group.visible = false;
+      scene.add(group);
+      obstaclePool.push({ mesh: group, material: obsMaterial, type: i });
     }
   }
 
@@ -296,11 +237,9 @@ function init() {
 
   try {
     webglRenderer = new THREE.WebGLRenderer({
-      scene,
-      clearColor: 0x000000,
-      clearAlpha: 0.99,
       antialias: false
     });
+    webglRenderer.setClearColor(0x000000, 0.99);
     webglRenderer.setSize(
       window.innerWidth / sizeRatio,
       window.innerHeight / sizeRatio
@@ -308,17 +247,14 @@ function init() {
 
     webglRenderer.autoClear = false;
 
-    webglRenderer.shadowMapBias = 0.0039;
-    webglRenderer.shadowMapDarkness = 0.5;
-    webglRenderer.shadowMapWidth = 1024 / (sizeRatio * 2);
-    webglRenderer.shadowMapHeight = 1024 / (sizeRatio * 2);
+    webglRenderer.shadowMap.enabled = true;
+    webglRenderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    webglRenderer.shadowMapEnabled = true;
-    webglRenderer.shadowMapSoft = true;
-
-    webglRenderer.shadowCameraNear = 1;
-    webglRenderer.shadowCameraFar = 100000;
-    webglRenderer.shadowCameraFov = 50;
+    light.shadow.mapSize.width = 1024 / (sizeRatio * 2);
+    light.shadow.mapSize.height = 1024 / (sizeRatio * 2);
+    light.shadow.camera.near = 1;
+    light.shadow.camera.far = 100000;
+    light.shadow.camera.fov = 50;
 
     container.appendChild(webglRenderer.domElement);
     hasGl = 1;
@@ -333,59 +269,51 @@ function init() {
       webglRenderer.domElement.style.webkitTransformOrigin = '0 0 0';
     }
   } catch (e) {
-    // need webgl
-    document.getElementById('info').innerHTML = "<P><BR><B>Note.</B> You need a modern browser that supports WebGL for this to run the way it is intended.<BR>For example. <a href='http://www.google.com/landing/chrome/beta/' target='_blank'>Google Chrome 9+</a> or <a href='http://www.mozilla.com/firefox/beta/' target='_blank'>Firefox 4+</a>.<BR><BR>If you are already using one of those browsers and still see this message, it's possible that you<BR>have old blacklisted GPU drivers. Try updating the drivers for your graphic card.<BR>Or try to set a '--ignore-gpu-blacklist' switch for the browser.</P><CENTER><BR><img src='../img/WebGL_logo.png' border='0'></CENTER>";
+    document.getElementById('info').innerHTML = "<P><BR><B>Note.</B> You need a modern browser that supports WebGL for this to run the way it is intended.</P>";
     document.getElementById('info').style.display = 'block';
     return;
   }
 
   if (postprocessing) {
-    // postprocessing
     const renderModel = new THREE.RenderPass(scene, camera);
     const effectBloom = new THREE.BloomPass(0.75);
 
     const effectVignette = new THREE.ShaderPass(THREE.ShaderExtras.vignette);
-    effectVignette.uniforms.tDiffuse.texture = THREE.ImageUtils.loadTexture(
-      'img/Vignette_alpha.png'
-    );
+    effectVignette.uniforms.offset.value = 0.95;
+    effectVignette.uniforms.darkness.value = 0.9;
 
     effectFocus = new THREE.ShaderPass(THREE.ShaderExtras.focus);
-
     effectFocus.uniforms.screenWidth.value = window.innerWidth / sizeRatio;
     effectFocus.uniforms.screenHeight.value = window.innerHeight / sizeRatio;
     effectFocus.uniforms.sampleDistance.value = 0;
     effectFocus.uniforms.waveFactor.value = 0;
-
     effectFocus.renderToScreen = true;
 
     composer = new THREE.EffectComposer(webglRenderer);
-
     composer.addPass(renderModel);
     composer.addPass(effectBloom);
     composer.addPass(effectVignette);
     composer.addPass(effectFocus);
-    //
   }
 }
 
-// fullscreen test
 function toggleFullscreen() {
   if (!inFullscreen) {
     try {
       if (container.webkitRequestFullScreen) {
         container.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-      } else {
-        container.mozRequestFullScreen();
+      } else if (container.requestFullscreen) {
+        container.requestFullscreen();
       }
       inFullscreen = true;
     } catch (e) {
-      // not avalaiable
+      // not available
     }
   } else {
     if (document.webkitCancelFullScreen) {
       document.webkitCancelFullScreen();
-    } else {
-      document.mozCancelFullScreen();
+    } else if (document.exitFullscreen) {
+      document.exitFullscreen();
     }
     inFullscreen = false;
   }
@@ -393,55 +321,42 @@ function toggleFullscreen() {
 
 function loadingComplete() {
   allLoaded = true;
-  scene.removeChild(loadingSprite);
-  loadingSprite = undefined;
   showInstruction(true);
 }
 
 function startGame() {
   started = true;
   hideInstruction();
-
-  const alphaTween = new TWEEN.Tween(bgSprite)
-    .to({ opacity: 0 }, 2000)
-    .easing(TWEEN.Easing.Sinusoidal.EaseOut)
-    .onComplete(removeBg);
-  alphaTween.start();
-}
-
-function removeBg() {
-  scene.removeChild(bgSprite);
-  bgSprite = undefined;
 }
 
 function addParticles() {
-  // Particles (explosion)
-  const geometry = new THREE.Geometry();
-
-  for (i = 0; i < 500; i++) {
-    const radius = Math.random() * 50;
-    const vector = getRandomPointOnSphere(radius);
-    geometry.vertices.push(new THREE.Vertex(vector));
-  }
-
-  const particleImage = THREE.ImageUtils.loadTexture('img/fraction1.png');
+  const particleImg = textureLoader.load('img/fraction1.png');
   const colorArray = [0xffffff, 0xfabe82, 0xe03809, 0xee9c64, 0x910300];
   const sizeArray = [48, 48, 48, 48, 64];
 
   for (let i = 0; i < 15; ++i) {
+    const pts = [];
+    for (let k = 0; k < 500; k++) {
+      const radius = Math.random() * 50;
+      const v = getRandomPointOnSphere(radius);
+      pts.push(v.x, v.y, v.z);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+
     const color = colorArray[i % colorArray.length];
     const size = sizeArray[i % sizeArray.length];
 
-    const particleMaterial = new THREE.ParticleBasicMaterial({
+    const particleMaterial = new THREE.PointsMaterial({
       color,
       size,
-      map: particleImage,
+      map: particleImg,
       opacity: 1.0,
       transparent: true,
       depthTest: false,
       blending: THREE.AdditiveBlending
     });
-    particles = new THREE.ParticleSystem(geometry, particleMaterial);
+    const particles = new THREE.Points(geo, particleMaterial);
 
     particles.rotation.set(
       Math.random() * Math.PI,
@@ -452,23 +367,20 @@ function addParticles() {
     particles.scale.set(0.1, 0.1, 0.1);
     particles.visible = false;
 
-    scene.addChild(particles);
-    const o = { p: particles, m: particleMaterial };
-    particleArray.push(o);
+    scene.add(particles);
+    particleArray.push({ p: particles, m: particleMaterial });
   }
 }
 
-function trenchLoaded(geometry) {
-  const material = new THREE.MeshPhongMaterial({
+function trenchLoaded(geometry, materials) {
+  const trenchMaterial = new THREE.MeshPhongMaterial({
     color: 0x111111,
-    ambient: 0x222222,
     specular: 0x000000,
-    shininess: 100,
-    shading: THREE.SmoothShading
+    shininess: 100
   });
 
   for (let i = 0; i < numOfTrench; ++i) {
-    const mesh = new THREE.Mesh(geometry, material);
+    const mesh = new THREE.Mesh(geometry, trenchMaterial);
 
     const scale = 200;
     mesh.scale.set(scale, scale * 1.6, scale * 1.6);
@@ -478,19 +390,21 @@ function trenchLoaded(geometry) {
     mesh.castShadow = false;
     mesh.receiveShadow = true;
 
-    scene.addChild(mesh);
+    scene.add(mesh);
     trenchArray.push(mesh);
   }
 
-  loader.load({ model: './models/xwing.js', callback: xwingLoaded });
+  loader.load('./models/xwing.js', xwingLoaded);
 }
 
-function xwingLoaded(geometry) {
-  const material = new THREE.MeshFaceMaterial();
+function xwingLoaded(geometry, materials) {
+  const xwingMaterial = materials.length > 0
+    ? materials
+    : new THREE.MeshPhongMaterial({ color: 0x888888, specular: 0x333333, shininess: 50 });
 
   xwing = new THREE.Object3D();
 
-  ship = new THREE.Mesh(geometry, material);
+  ship = new THREE.Mesh(geometry, xwingMaterial);
 
   const scale = 0.8;
   ship.scale.set(scale, scale, scale);
@@ -500,36 +414,41 @@ function xwingLoaded(geometry) {
   ship.castShadow = true;
   ship.receiveShadow = false;
 
-  xwing.addChild(ship);
-  scene.addChild(xwing);
+  xwing.add(ship);
+  scene.add(xwing);
 
-  // thrust
-  const thrustImage = THREE.ImageUtils.loadTexture('img/thrust.png');
+  // Thrust sprites
+  const thrustImage = textureLoader.load('img/thrust.png');
   const scale2 = 0.25;
 
-  thrust0 = new THREE.Sprite({ map: thrustImage, useScreenCoordinates: false });
+  const makeThrustSprite = function() {
+    return new THREE.Sprite(new THREE.SpriteMaterial({
+      map: thrustImage,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      opacity: 0.5
+    }));
+  };
+
+  thrust0 = makeThrustSprite();
   thrust0.position.set(-175, 25, -42);
   thrust0.scale.set(scale2, scale2, scale2);
-  thrust0.blending = THREE.AdditiveBlending;
-  ship.addChild(thrust0);
+  ship.add(thrust0);
 
-  thrust1 = new THREE.Sprite({ map: thrustImage, useScreenCoordinates: false });
+  thrust1 = makeThrustSprite();
   thrust1.position.set(-175, 25, 42);
   thrust1.scale.set(scale2, scale2, scale2);
-  thrust1.blending = THREE.AdditiveBlending;
-  ship.addChild(thrust1);
+  ship.add(thrust1);
 
-  thrust2 = new THREE.Sprite({ map: thrustImage, useScreenCoordinates: false });
+  thrust2 = makeThrustSprite();
   thrust2.position.set(-175, -23, -42);
   thrust2.scale.set(scale2, scale2, scale2);
-  thrust2.blending = THREE.AdditiveBlending;
-  ship.addChild(thrust2);
+  ship.add(thrust2);
 
-  thrust3 = new THREE.Sprite({ map: thrustImage, useScreenCoordinates: false });
+  thrust3 = makeThrustSprite();
   thrust3.position.set(-175, -23, 42);
   thrust3.scale.set(scale2, scale2, scale2);
-  thrust3.blending = THREE.AdditiveBlending;
-  ship.addChild(thrust3);
+  ship.add(thrust3);
 
   addParticles();
   loadingComplete();
@@ -560,9 +479,9 @@ function hideResult() {
   resultbox.style.display = 'none';
 }
 
-function showInstruction(loadingComplete) {
+function showInstruction(loadingDone) {
   const instructionbox = document.getElementById('instructionbox');
-  if (loadingComplete) {
+  if (loadingDone) {
     instructionbox.innerHTML = "<img src='img/click.png'>";
   }
   instructionbox.innerHTML += "<BR><BR><img src='img/instructions.png'>";
@@ -591,13 +510,11 @@ function onTouchStart(event) {
   const resultbox = document.getElementById('resultbox');
   if (isDead && resultbox.style.display === 'block') {
     hideResult();
-    // reset
     score = 0;
     speedMultiplier = 4;
     return;
   }
 
-  // doubletap?
   if (time < lastTap + 400) {
     changeRotation();
   }
@@ -647,7 +564,6 @@ function onDocumentMouseDown(event) {
   const resultbox = document.getElementById('resultbox');
   if (isDead && resultbox.style.display === 'block') {
     hideResult();
-    // reset
     score = 0;
     speedMultiplier = 4;
     return;
@@ -678,7 +594,6 @@ function onDocumentKeyDown(event) {
   const resultbox = document.getElementById('resultbox');
   if (isDead && resultbox.style.display === 'block') {
     hideResult();
-    // reset
     score = 0;
     speedMultiplier = 4;
     return;
@@ -753,12 +668,11 @@ function getRandomPointOnSphere(r) {
   const angle = Math.random() * Math.PI * 2;
   const u = Math.random() * 2 - 1;
 
-  const v = new THREE.Vector3(
+  return new THREE.Vector3(
     Math.cos(angle) * Math.sqrt(1 - u ** 2) * r,
     Math.sin(angle) * Math.sqrt(1 - u ** 2) * r,
     u * r
   );
-  return v;
 }
 
 function spawnNewObstacle() {
@@ -775,14 +689,12 @@ function spawnNewObstacle() {
   const mesh = o[0].mesh;
   const type = o[0].type;
 
-  // add mesh
   mesh.position.z = -(numOfTrench - 1) * trenchLength - trenchLength / 2;
   if (type === 0) {
     mesh.position.y = Math.random() * 900 - 400;
   } else if (type === 1) {
     mesh.position.x = Math.random() * 1200 - 600;
   } else if (type === 2 || type === 3) {
-    // random flip
     let rot = 0;
     if (Math.random() > 0.5) rot = Math.PI;
     mesh.rotation.y = rot;
@@ -795,7 +707,7 @@ function run(delta) {
     return;
   }
 
-  // trenches
+  // Trenches
   for (let i = 0; i < trenchArray.length; ++i) {
     const mesh = trenchArray[i];
     mesh.position.z += speed;
@@ -809,13 +721,12 @@ function run(delta) {
     }
   }
 
-  // obstacles
+  // Obstacles
   for (let i = 0; i < obstacleArray.length; ++i) {
     const type = obstacleArray[i].type;
     const mesh = obstacleArray[i].mesh;
     mesh.position.z += speed;
 
-    // respawn / remove
     if (mesh.position.z > camera.position.z + trenchLength / 2) {
       mesh.visible = false;
       const shifted = obstacleArray.shift();
@@ -823,7 +734,6 @@ function run(delta) {
       spawnNewObstacle();
     }
 
-    // collision
     if (xwing && time > deadTimer + 2000) {
       const difz = xwing.position.z - mesh.position.z;
 
@@ -832,7 +742,6 @@ function run(delta) {
         const difX = xwing.position.x - mesh.position.x;
 
         if (type === 0) {
-          // horizontal bar
           if (!sideWays.state && difY < 210 && difY > -210) {
             explode();
             isDead = true;
@@ -846,7 +755,6 @@ function run(delta) {
         }
 
         if (type === 1) {
-          // vertical bar
           if (!sideWays.state && difX < 370 && difX > -370) {
             explode();
             isDead = true;
@@ -860,7 +768,6 @@ function run(delta) {
         }
 
         if (type === 2) {
-          // 1/4 hole down
           if (
             !sideWays.state
             && mesh.rotation.y === 0
@@ -887,7 +794,6 @@ function run(delta) {
         }
 
         if (type === 3) {
-          // 1/4 hole up
           if (
             !sideWays.state
             && mesh.rotation.y === 0
@@ -916,7 +822,7 @@ function run(delta) {
     }
   }
 
-  // key control
+  // Key control
   if (leftIsDown) mouseXpercent -= 0.003 * delta;
   if (rightIsDown) mouseXpercent += 0.003 * delta;
   if (upIsDown) mouseYpercent -= 0.0025 * delta;
@@ -927,13 +833,11 @@ function run(delta) {
   if (mouseYpercent < -1) mouseYpercent = -1;
   if (mouseYpercent > 1) mouseYpercent = 1;
 
-  // xwing
   if (!xwing) {
     return;
   }
 
   const optimalDivider = delta / 16;
-
   const smoothing = Math.max(8, 12 / optimalDivider);
 
   let toX = mouseXpercent * 380;
@@ -960,30 +864,27 @@ function run(delta) {
   xwing.rotation.z = -(difX / 40);
   xwing.rotation.z += sideWays.rotation;
 
-  // thrust
+  // Thrust opacity
   let opacity = (Math.abs(difX) + Math.abs(difY)) / 8;
   opacity = Math.min(opacity, 1);
   opacity = Math.max(opacity, 0.3);
-
-  const noise = Math.random() * 0.5;
-  opacity += noise;
+  opacity += Math.random() * 0.5;
 
   if (!ship.visible) {
     opacity = 0;
   }
 
-  thrust0.opacity = opacity;
-  thrust1.opacity = opacity;
-  thrust2.opacity = opacity;
-  thrust3.opacity = opacity;
+  thrust0.material.opacity = opacity;
+  thrust1.material.opacity = opacity;
+  thrust2.material.opacity = opacity;
+  thrust3.material.opacity = opacity;
 
-  // blink
+  // Blink after respawn
   if (time < deadTimer + 2000) {
     ship.visible = true;
     if (time < deadTimer + 600) {
       ship.visible = false;
     }
-
     if (time < deadTimer + 800 && time > deadTimer + 700) {
       ship.visible = false;
     }
@@ -995,12 +896,12 @@ function run(delta) {
     }
   }
 
-  // lasers
+  // Lasers
   if ((mouseDown || ctrlIsDown) && time > deadTimer + 1500) {
     fire();
   }
 
-  // camera
+  // Camera follow
   const toX1 = xwing.position.x;
   toY = xwing.position.y + 50;
 
@@ -1025,17 +926,17 @@ function explode() {
 
     const outscale = 3 + Math.random() * 5;
 
-    const scaletween = new TWEEN.Tween(particles.scale)
+    new TWEEN.Tween(particles.scale)
       .to({ x: outscale, y: outscale, z: outscale }, 1500)
-      .easing(TWEEN.Easing.Exponential.EaseOut);
-    scaletween.start();
+      .easing(TWEEN.Easing.Exponential.EaseOut)
+      .start();
 
-    const alphatween = new TWEEN.Tween(material)
+    new TWEEN.Tween(material)
       .to({ opacity: 0 }, 1500)
-      .easing(TWEEN.Easing.Exponential.EaseOut);
-    alphatween.start();
+      .easing(TWEEN.Easing.Exponential.EaseOut)
+      .start();
 
-    const rotatetween = new TWEEN.Tween(particles.rotation)
+    new TWEEN.Tween(particles.rotation)
       .to(
         {
           x: particles.rotation.x + 0.75,
@@ -1044,10 +945,10 @@ function explode() {
         },
         1700
       )
-      .easing(TWEEN.Easing.Exponential.EaseOut);
-    rotatetween.start();
+      .easing(TWEEN.Easing.Exponential.EaseOut)
+      .start();
 
-    const positiontween = new TWEEN.Tween(particles.position)
+    new TWEEN.Tween(particles.position)
       .to(
         {
           x: camera.position.x,
@@ -1056,24 +957,24 @@ function explode() {
         },
         2500
       )
-      .easing(TWEEN.Easing.Exponential.EaseOut);
-    positiontween.start();
+      .easing(TWEEN.Easing.Exponential.EaseOut)
+      .start();
   }
 
-  const delaytween = new TWEEN.Tween(camera.up)
+  new TWEEN.Tween(camera.up)
     .to({ x: 0 }, 1000)
     .easing(TWEEN.Easing.Exponential.EaseOut)
     .delay(1500)
-    .onComplete(explodeDone);
-  delaytween.start();
+    .onComplete(explodeDone)
+    .start();
 
   shakeCameraTimer = time;
 
   ship.visible = false;
-  thrust0.opacity = 0;
-  thrust1.opacity = 0;
-  thrust2.opacity = 0;
-  thrust3.opacity = 0;
+  thrust0.material.opacity = 0;
+  thrust1.material.opacity = 0;
+  thrust2.material.opacity = 0;
+  thrust3.material.opacity = 0;
 }
 
 function explodeDone() {
@@ -1090,10 +991,10 @@ function explodeDone() {
     material.opacity = 1;
     particles.visible = false;
 
-    const positiontween = new TWEEN.Tween(particles.position)
+    new TWEEN.Tween(particles.position)
       .to({ z: particles.position.z - 500 }, 1000)
-      .easing(TWEEN.Easing.Linear.EaseNone);
-    positiontween.start();
+      .easing(TWEEN.Easing.Linear.EaseNone)
+      .start();
   }
 
   showResult(score);
@@ -1108,12 +1009,10 @@ function fire() {
 
   lastFireTime = time;
 
-  laserContainer.rotation = xwing.rotation.clone();
+  laserContainer.rotation.copy(xwing.rotation);
   laserContainer.rotation.y = Math.PI / 2;
-
   laserContainer.rotation.z -= sideWays.rotation;
-
-  laserContainer.position = xwing.position.clone();
+  laserContainer.position.copy(xwing.position);
 
   if (!sideWays.state) {
     laser0Mesh.position.set(500, 45, -165);
@@ -1138,33 +1037,33 @@ function fire() {
   const distance = 10000;
   const tweentime = 300;
 
-  const tween0 = new TWEEN.Tween(laser0Mesh.position)
-    .to({ x: distance }, tweentime)
-    .easing(TWEEN.Easing.Linear.EaseNone);
-  tween0.start();
-
-  const tween1 = new TWEEN.Tween(laser1Mesh.position)
-    .to({ x: distance }, tweentime)
-    .easing(TWEEN.Easing.Linear.EaseNone);
-  tween1.start();
-
-  const tween2 = new TWEEN.Tween(laser2Mesh.position)
-    .to({ x: distance }, tweentime)
-    .easing(TWEEN.Easing.Linear.EaseNone);
-  tween2.start();
-
-  const tween3 = new TWEEN.Tween(laser3Mesh.position)
+  new TWEEN.Tween(laser0Mesh.position)
     .to({ x: distance }, tweentime)
     .easing(TWEEN.Easing.Linear.EaseNone)
-    .onComplete(removeLasers);
-  tween3.start();
+    .start();
+
+  new TWEEN.Tween(laser1Mesh.position)
+    .to({ x: distance }, tweentime)
+    .easing(TWEEN.Easing.Linear.EaseNone)
+    .start();
+
+  new TWEEN.Tween(laser2Mesh.position)
+    .to({ x: distance }, tweentime)
+    .easing(TWEEN.Easing.Linear.EaseNone)
+    .start();
+
+  new TWEEN.Tween(laser3Mesh.position)
+    .to({ x: distance }, tweentime)
+    .easing(TWEEN.Easing.Linear.EaseNone)
+    .onComplete(removeLasers)
+    .start();
 
   const toz = pointLight.position.z - distance * 2;
-  const tweenLight = new TWEEN.Tween(pointLight.position)
+  new TWEEN.Tween(pointLight.position)
     .to({ z: toz }, tweentime * 2)
     .easing(TWEEN.Easing.Linear.EaseNone)
-    .onComplete(removeLight);
-  tweenLight.start();
+    .onComplete(removeLight)
+    .start();
 }
 
 function removeLasers() {
@@ -1198,14 +1097,13 @@ function loop() {
 
   if (started) {
     score += Math.round(delta / 2);
-
     speed = delta * speedMultiplier;
 
     if (speedMultiplier < 9) {
       speedMultiplier += 0.001;
     }
 
-    // shake camera
+    // Camera shake on explosion
     if (time < shakeCameraTimer + 1500) {
       const expo = (shakeCameraTimer + 1500 - time) / 1500;
       camera.up.x = (Math.random() * 0.2 - 0.1) * expo;
@@ -1217,22 +1115,10 @@ function loop() {
     }
 
     run(delta);
-  } else if (loadingSprite) {
-    loadingSprite.position.set(
-      (window.innerWidth / sizeRatio) >> 1,
-      ((window.innerHeight / sizeRatio) >> 1) - 20,
-      0
-    );
-    loadingSprite.rotation -= 0.08;
   }
 
-  if (bgSprite) {
-    bgSprite.position.set(
-      (window.innerWidth / sizeRatio) >> 1,
-      (window.innerHeight / sizeRatio) >> 1,
-      0
-    );
-  }
+  // Update camera to always look forward down the trench
+  camera.lookAt(0, 0, -1200);
 
   TWEEN.update();
 
