@@ -84,15 +84,22 @@ function init() {
   scene.fog = new THREE.Fog(0x000000, 20000, 25000);
 
   // Lights
-  const ambient = new THREE.AmbientLight(0x111111);
+  const ambient = new THREE.AmbientLight(0x888888);
   scene.add(ambient);
 
-  const light = new THREE.SpotLight(0x999999, 0.7, 0);
-  light.position.set(-100, 1000, 1000);
-  light.target.position.set(0, 0, -1000);
+  const light = new THREE.SpotLight(0xffffff, 2.0, 0);
+  light.position.set(0, 500, 500);
+  light.target.position.set(0, 0, -3000);
   light.castShadow = true;
   scene.add(light);
   scene.add(light.target);
+
+  // Directional fill light from camera direction
+  const fillLight = new THREE.DirectionalLight(0xaaaaaa, 1.5);
+  fillLight.position.set(0, 100, 200);
+  fillLight.target.position.set(0, 0, -1000);
+  scene.add(fillLight);
+  scene.add(fillLight.target);
 
   pointLight = new THREE.PointLight(0xf43b3c, 0.4, 5000);
   pointLight.position.set(0, -5000, -5000);
@@ -164,9 +171,11 @@ function init() {
 
   for (let i = 0; i < 4; ++i) {
     const obsMaterial = new THREE.MeshPhongMaterial({
-      color: 0x111111,
-      specular: 0x000000,
-      shininess: 100
+      color: 0x888888,
+      emissive: 0x555555,
+      specular: 0x444444,
+      shininess: 30,
+      side: THREE.DoubleSide
     });
 
     for (let j = 0; j < numArray[i]; ++j) {
@@ -374,9 +383,11 @@ function addParticles() {
 
 function trenchLoaded(geometry, materials) {
   const trenchMaterial = new THREE.MeshPhongMaterial({
-    color: 0x111111,
-    specular: 0x000000,
-    shininess: 100
+    color: 0x888888,
+    emissive: 0x666666,
+    specular: 0x444444,
+    shininess: 30,
+    side: THREE.DoubleSide
   });
 
   for (let i = 0; i < numOfTrench; ++i) {
@@ -424,9 +435,10 @@ function xwingLoaded(geometry, materials) {
   const makeThrustSprite = function() {
     return new THREE.Sprite(new THREE.SpriteMaterial({
       map: thrustImage,
+      color: 0xff6600,
       blending: THREE.AdditiveBlending,
       transparent: true,
-      opacity: 0.5
+      opacity: 1.0
     }));
   };
 

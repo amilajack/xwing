@@ -113,14 +113,17 @@ THREE.LegacyModelLoader.prototype.parse = function(model) {
   const materials = [];
   if (model.materials) {
     for (const m of model.materials) {
+      const diffuse = m.colorDiffuse
+        ? new THREE.Color(m.colorDiffuse[0], m.colorDiffuse[1], m.colorDiffuse[2])
+        : new THREE.Color(0x888888);
       const mat = new THREE.MeshPhongMaterial({
-        color: m.colorDiffuse
-          ? new THREE.Color(m.colorDiffuse[0], m.colorDiffuse[1], m.colorDiffuse[2])
-          : 0x888888,
+        color: diffuse,
+        emissive: diffuse.clone().multiplyScalar(0.3),
         specular: m.colorSpecular
           ? new THREE.Color(m.colorSpecular[0], m.colorSpecular[1], m.colorSpecular[2])
-          : 0x000000,
-        shininess: m.specularCoef || 0
+          : new THREE.Color(0x222222),
+        shininess: m.specularCoef || 30,
+        side: THREE.DoubleSide
       });
       materials.push(mat);
     }
