@@ -76,6 +76,7 @@ THREE.EffectComposer.prototype = {
 
 THREE.EffectComposer.geometry = new THREE.PlaneGeometry(2, 2);
 THREE.EffectComposer.quad = new THREE.Mesh(THREE.EffectComposer.geometry, null);
+THREE.EffectComposer.quad.frustumCulled = false;
 THREE.EffectComposer.scene = new THREE.Scene();
 THREE.EffectComposer.scene.add(THREE.EffectComposer.quad);
-THREE.EffectComposer.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+THREE.EffectComposer.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, -1, 1);

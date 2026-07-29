@@ -61,7 +61,7 @@ let effectFocus;
 
 let touchDevice = false;
 let sizeRatio = 1;
-let postprocessing = true;
+let postprocessing = false;
 
 const textureLoader = new THREE.TextureLoader();
 
@@ -83,23 +83,16 @@ function init() {
   scene = new THREE.Scene();
   scene.fog = new THREE.Fog(0x000000, 20000, 25000);
 
-  // Lights
-  const ambient = new THREE.AmbientLight(0x888888);
+  // Lights — original r44 values (SRGBColorSpace direct render, no postprocessing)
+  const ambient = new THREE.AmbientLight(0x111111);
   scene.add(ambient);
 
-  const light = new THREE.SpotLight(0xffffff, 2.0, 0);
-  light.position.set(0, 500, 500);
-  light.target.position.set(0, 0, -3000);
+  const light = new THREE.SpotLight(0x999999, 0.7, 0);
+  light.position.set(-100, 1000, 1000);
+  light.target.position.set(0, 0, -1000);
   light.castShadow = true;
   scene.add(light);
   scene.add(light.target);
-
-  // Directional fill light from camera direction
-  const fillLight = new THREE.DirectionalLight(0xaaaaaa, 1.5);
-  fillLight.position.set(0, 100, 200);
-  fillLight.target.position.set(0, 0, -1000);
-  scene.add(fillLight);
-  scene.add(fillLight.target);
 
   pointLight = new THREE.PointLight(0xf43b3c, 0.4, 5000);
   pointLight.position.set(0, -5000, -5000);
@@ -171,11 +164,10 @@ function init() {
 
   for (let i = 0; i < 4; ++i) {
     const obsMaterial = new THREE.MeshPhongMaterial({
-      color: 0x888888,
-      emissive: 0x555555,
-      specular: 0x444444,
-      shininess: 30,
-      side: THREE.DoubleSide
+      color: 0x111111,
+      emissive: 0x222222,
+      specular: 0x000000,
+      shininess: 100
     });
 
     for (let j = 0; j < numArray[i]; ++j) {
@@ -288,8 +280,8 @@ function init() {
     const effectBloom = new THREE.BloomPass(0.75);
 
     const effectVignette = new THREE.ShaderPass(THREE.ShaderExtras.vignette);
-    effectVignette.uniforms.offset.value = 0.95;
-    effectVignette.uniforms.darkness.value = 0.9;
+    effectVignette.uniforms.offset.value = 1.0;
+    effectVignette.uniforms.darkness.value = 1.0;
 
     effectFocus = new THREE.ShaderPass(THREE.ShaderExtras.focus);
     effectFocus.uniforms.screenWidth.value = window.innerWidth / sizeRatio;
@@ -300,7 +292,6 @@ function init() {
 
     composer = new THREE.EffectComposer(webglRenderer);
     composer.addPass(renderModel);
-    composer.addPass(effectBloom);
     composer.addPass(effectVignette);
     composer.addPass(effectFocus);
   }
@@ -383,11 +374,10 @@ function addParticles() {
 
 function trenchLoaded(geometry, materials) {
   const trenchMaterial = new THREE.MeshPhongMaterial({
-    color: 0x888888,
-    emissive: 0x666666,
-    specular: 0x444444,
-    shininess: 30,
-    side: THREE.DoubleSide
+    color: 0x111111,
+    emissive: 0x222222,
+    specular: 0x000000,
+    shininess: 100
   });
 
   for (let i = 0; i < numOfTrench; ++i) {
@@ -435,10 +425,10 @@ function xwingLoaded(geometry, materials) {
   const makeThrustSprite = function() {
     return new THREE.Sprite(new THREE.SpriteMaterial({
       map: thrustImage,
-      color: 0xff6600,
+      color: 0xff3300,
       blending: THREE.AdditiveBlending,
       transparent: true,
-      opacity: 1.0
+      opacity: 0.9
     }));
   };
 

@@ -170,7 +170,10 @@ THREE.ShaderExtras = {
       'if( tmp.b < color.b ) color = tmp;',
       'color = color * vec4( 2.0 ) - ( add / vec4( 8.0 ) );',
       'color = color + ( add / vec4( 8.0 ) - color ) * ( vec4( 1.0 ) - vec4( sample_dist * 0.5 ) );',
-      'gl_FragColor = vec4( color.rgb * color.rgb * vec3( 0.95 ) + color.rgb, 1.0 );',
+      'vec3 finalRGB = color.rgb * color.rgb * vec3( 0.95 ) + color.rgb;',
+      // Apply sRGB gamma encoding so ShaderMaterial output matches built-in material output
+      'finalRGB = pow( clamp( finalRGB, 0.0, 1.0 ), vec3( 1.0 / 2.2 ) );',
+      'gl_FragColor = vec4( finalRGB, 1.0 );',
       '}'
     ].join('\n')
   },
