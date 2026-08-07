@@ -5,8 +5,6 @@ xwing
 
 ### A WebGL game powered by three.js
 
-[![Build Status](https://travis-ci.com/amilajack/xwing.svg?branch=master)](https://travis-ci.com/amilajack/xwing)
-
 ## Play It!
 
 Play it at **[amilajack.github.io/xwing](https://amilajack.github.io/xwing/)**
